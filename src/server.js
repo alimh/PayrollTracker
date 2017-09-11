@@ -7,6 +7,7 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter as Router } from 'react-router-dom';
 import { App } from './components/App';
+import ApiSettings from './api/settings';
 
 const app = new Express();
 const server = new Server(app);
@@ -18,6 +19,16 @@ app.set('views', path.join(__dirname, 'views'));
 
 // define the folder that will be used for static assets
 app.use(Express.static(path.join(__dirname, 'static')));
+
+// app.use('/api/settings', (req, res) => {
+//   const data = {
+//     PCs: ['304248', '302254'],
+//     Roles: ['Baker', 'Finisher', 'Crew', 'Maintenance'],
+//   };
+//   return res.status(200).json(data).end();
+// });
+
+app.use('/api/settings', ApiSettings);
 
 // universal routing and rendering
 app.get('*', (req, res) => {

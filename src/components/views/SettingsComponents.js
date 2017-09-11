@@ -12,10 +12,14 @@ class SettingsComponents extends React.Component {
   }
 
   updateNewText(e) {
-    console.log('updating text', e.target.value);
     this.setState({
       text: e.target.value,
     });
+  }
+
+  handleAdd() {
+    this.props.onCreate(this.state.text);
+    this.setState({ text: '' });
   }
 
   handleDisable(e, key) {
@@ -35,8 +39,14 @@ class SettingsComponents extends React.Component {
                 )
             }
           </ul>
-          <input id="text" type="text" onChange={e => this.updateNewText(e)} />
-          <button onClick={() => this.props.onCreate(this.state.text)}>Save</button>
+          <input
+            id="text"
+            type="text"
+            value={this.state.text}
+            onChange={e => this.updateNewText(e)}
+            onBlur={e => this.updateNewText(e)}
+          />
+          <button onClick={() => this.handleAdd()}>Add</button>
         </div>
       </div>
     );

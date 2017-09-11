@@ -4,7 +4,8 @@ import { Layout } from './Layout';
 import { IndexPage } from './IndexPage';
 import { AthletePage } from './AthletePage';
 import { NotFoundPage } from './NotFoundPage';
-import { SettingsPage } from './controllers/SettingsPage';
+import { SettingsPage } from './containers/SettingsPage';
+import { EmployeeSearchPage } from './containers/EmployeeSearchPage';
 import athletes from '../data/athletes';
 
 const renderIndex = () => <IndexPage athletes={athletes} />;
@@ -24,6 +25,7 @@ export const App = () => (
     <Switch>
       <Route exact path="/" render={renderIndex} />
       <Route exact path="/settings" render={renderSettings} />
+      <Route exact path="/employees" component={EmployeeSearchPage} />
       <Route exact path="/athlete/:id" render={renderAthlete} />
       <Route component={NotFoundPage} />
     </Switch>
