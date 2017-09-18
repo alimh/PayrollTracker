@@ -31,7 +31,6 @@ router.get('/all', (req, res) => {
     //         }
     //     });
     // });
-  console.log('called settings/all');
   const data = {
     PCs: ['304248', '302254'],
     Roles: ['Baker', 'Finisher', 'Crew', 'Maintenance'],
@@ -39,4 +38,11 @@ router.get('/all', (req, res) => {
   return res.status(200).json(data).end();
 });
 
+router.get('/job-options', (req, res) => {
+  const data = {
+    pers: ['Hour', 'Shift', 'Mile', 'Week'],
+    roles: ['Baker', 'Finisher', 'Crew', 'Maintenance'],
+  };
+  return res.status(200).json(data).end();
+});
 export default router;

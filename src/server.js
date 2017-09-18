@@ -8,6 +8,7 @@ import { renderToString } from 'react-dom/server';
 import { StaticRouter as Router } from 'react-router-dom';
 import { App } from './components/App';
 import ApiSettings from './api/settings';
+import ApiEmployees from './api/employees';
 
 const app = new Express();
 const server = new Server(app);
@@ -29,6 +30,7 @@ app.use(Express.static(path.join(__dirname, 'static')));
 // });
 
 app.use('/api/settings', ApiSettings);
+app.use('/api/employees', ApiEmployees);
 
 // universal routing and rendering
 app.get('*', (req, res) => {
