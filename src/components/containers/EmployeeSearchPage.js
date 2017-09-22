@@ -13,13 +13,12 @@ export class EmployeeSearchPage extends React.Component {
       employeeListFiltered: null,
       employeeDetailStatus: null,
       employee: null,
+      errDetail: null,
+      jobDetails: null,
     };
   }
 
   componentDidMount() {
-    console.log('calling /employees/list');
-    console.log(this.state);
-
     Axios.get('/api/employees/list').then((response) => {
       const data = response.data;
       this.setState({ employeeList: data, employeeListFiltered: data });
@@ -27,7 +26,6 @@ export class EmployeeSearchPage extends React.Component {
   }
 
   handleSearch(searchText) {
-    console.log('searching: ');
     const searchUpper = searchText.toString().toUpperCase();
     const listNew = this.state.employeeList.filter((e) => {
       const keys = e.search;
@@ -43,7 +41,6 @@ export class EmployeeSearchPage extends React.Component {
     // 3. then, update state of retrieving and display employee info.
     this.setState({ employeeDetailStatus: 'loading' });
     const api = '/api/employees/detail/'.concat(id);
-    console.log('selecting from '.concat(api));
     Axios.get(api).then((response) => {
       const data = response.data;
       this.setState({
@@ -53,9 +50,34 @@ export class EmployeeSearchPage extends React.Component {
     });
   }
 
+  handleNew(newJob) {
+    // 1. POST info to API
+    // 2. Call componentDidMount() to update state?
+    const payload = { ...newJob, id: this.state.employee.id };
+    Axios.post('/api/employees/job/new', payload)
+      .then(() => {
+        this.setState({ jobDetails: null });
+        this.handleSelect(this.state.employee.id);
+      })
+      .catch((res) => {
+        this.setState({ errDetail: 'Server error: '.concat(res), jobDetails: newJob });
+      });
+  }
+
+  handleDelete(n) {
+    // 1. POST delete request to API
+    // 2. Update state by calling componentDidMOunt() ?
+    const payload = { id: this.state.employee.id, job: n };
+    Axios.post('/api/employees/job/delete', payload)
+      .then(() => {
+        this.handleSelect(this.state.employee.id);
+      })
+      .catch((res) => {
+        this.setState({ errDetail: 'Server error: '.concat(res) });
+      });
+  }
+
   render() {
-    console.log('rendering EmployeeSearchPage: ');
-    console.log(this.state);
     return (
       <div className="page-content">
         <EmployeeSearch onUpdate={searchText => this.handleSearch(searchText)} />
@@ -64,7 +86,16 @@ export class EmployeeSearchPage extends React.Component {
             list={this.state.employeeListFiltered}
             onSelect={id => this.handleSelect(id)}
           /> : <p>Retreiving list of employees...</p>}
-        {this.state.employee ? <EmployeeDetail employee={this.state.employee} /> : <p>Select an employee</p>}
+        {this.state.employee ?
+          <EmployeeDetail
+            employee={this.state.employee}
+            jobDetails={this.state.jobDetails}
+            errorMsg={this.state.errDetail}
+            onDelete={n => this.handleDelete(n)}
+            onNew={newJob => this.handleNew(newJob)}
+          /> :
+          <p>Select an employee</p>
+        }
       </div>
     );
   }

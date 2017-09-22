@@ -6,6 +6,7 @@ import Express from 'express';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter as Router } from 'react-router-dom';
+import bodyParser from 'body-parser';
 import { App } from './components/App';
 import ApiSettings from './api/settings';
 import ApiEmployees from './api/employees';
@@ -20,6 +21,8 @@ app.set('views', path.join(__dirname, 'views'));
 
 // define the folder that will be used for static assets
 app.use(Express.static(path.join(__dirname, 'static')));
+
+app.use(bodyParser.json());
 
 // app.use('/api/settings', (req, res) => {
 //   const data = {

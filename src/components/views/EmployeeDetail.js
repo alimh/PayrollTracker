@@ -2,15 +2,19 @@ import React from 'react';
 import EmployeeDetailNewJob from './EmployeeDetailNewJob';
 
 const EmployeeDetail = (props) => {
-  const handleDelete = (n) => {
+  const handleDelete = (e, n) => {
+    e.preventDefault();
     props.onDelete(n);
   };
+
   const handleSave = (newJob) => {
-    console.log(newJob);
+    props.onNew(newJob);
   };
+
   return (
     <div id="EmployeeDetail">
       <h4>Detail - {props.employee.name}</h4>
+      <div className="error-message">{props.errorMsg}</div>
       <table>
         <thead>
           <tr>
@@ -31,12 +35,15 @@ const EmployeeDetail = (props) => {
               <td>{x.per}</td>
               <td>{x.maxHours}</td>
               <td>{x.otExempt}</td>
-              <td><a href="" onClick={() => handleDelete(n)}>x</a></td>
+              <td><a href="" onClick={e => handleDelete(e, n)}>x</a></td>
             </tr>
         ))}
         </tbody>
       </table>
-      <EmployeeDetailNewJob onSave={newJob => handleSave(newJob)} />
+      <EmployeeDetailNewJob
+        jobDetails={props.jobDetails}
+        onSave={newJob => handleSave(newJob)}
+      />
     </div>
   );
 };

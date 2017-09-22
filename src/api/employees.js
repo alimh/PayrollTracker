@@ -77,4 +77,17 @@ router.get('/detail/:id', (req, res) => {
   return res.status(200).json(data).end();
 });
 
+router.post('/job/new', (req, res) => {
+  console.log(req.body);
+
+  return res.status(400).end();
+});
+
+router.post('/job/delete', (req, res) => {
+  console.log('got post request to delete');
+  console.log(req.body);
+
+  return res.status(400).end();
+});
+
 export default router;

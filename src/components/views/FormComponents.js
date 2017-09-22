@@ -7,7 +7,7 @@ export const InputBox = props => (
       className="input-box"
       id={props.name}
       type={props.inputType}
-      value={props.content}
+      value={props.value}
       onChange={e => props.onUpdate(e.target.value)}
       onBlur={e => props.onUpdate(e.target.value)}
       placeholder={props.placeholder}
@@ -21,7 +21,7 @@ export const SelectBox = props => (
     <select
       className="select-box"
       id={props.name}
-      value={props.selectedOption}
+      value={props.value}
       onChange={e => props.onUpdate(e.target.value)}
     >
       <option value="">{props.placeholder}</option>
