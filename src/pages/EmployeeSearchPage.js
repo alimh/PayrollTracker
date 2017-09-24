@@ -1,8 +1,8 @@
 import React from 'react';
 import Axios from 'axios';
-import EmployeeSearch from '../views/EmployeeSearch';
-import EmployeeList from '../views/EmployeeList';
-import EmployeeDetail from '../views/EmployeeDetail';
+import EmployeeSearch from '../components/EmployeeSearch';
+import EmployeeList from '../components/EmployeeList';
+import EmployeeDetail from '../components/EmployeeDetail';
 
 export class EmployeeSearchPage extends React.Component {
   constructor() {

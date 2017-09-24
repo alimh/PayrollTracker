@@ -1,6 +1,6 @@
 import React from 'react';
 import Axios from 'axios';
-import SettingsComponents from '../views/SettingsComponents';
+import SettingsComponents from '../components/SettingsComponents';
 
 export class SettingsPage extends React.Component {
   constructor() {

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { Layout } from './Layout';
-import { NotFoundPage } from './NotFoundPage';
-import { SettingsPage } from './containers/SettingsPage';
-import { EmployeeSearchPage } from './containers/EmployeeSearchPage';
+import { Layout } from './pages/Layout';
+import { NotFoundPage } from './components/NotFoundPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { EmployeeSearchPage } from './pages/EmployeeSearchPage';
 // import athletes from '../data/athletes';
 
 // const renderAthlete = ({ match, staticContext }) => {

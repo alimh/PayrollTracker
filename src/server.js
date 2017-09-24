@@ -7,7 +7,7 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter as Router } from 'react-router-dom';
 import bodyParser from 'body-parser';
-import { App } from './components/App';
+import { App } from './App';
 import ApiSettings from './api/settings';
 import ApiEmployees from './api/employees';
 
