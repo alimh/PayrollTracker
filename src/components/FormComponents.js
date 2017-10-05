@@ -11,7 +11,9 @@ export const InputBox = props => (
       onChange={e => props.onUpdate(e.target.value)}
       onBlur={e => props.onUpdate(e.target.value)}
       placeholder={props.placeholder}
+      style={props.errMsg ? { border: '2px solid red' } : {}}
     />
+    <span>{props.errMsg}</span>
   </div>
 );
 

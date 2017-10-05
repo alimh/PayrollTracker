@@ -80,7 +80,7 @@ router.get('/detail/:id', (req, res) => {
 router.post('/job/new', (req, res) => {
   console.log(req.body);
 
-  return res.status(400).end();
+  return res.status(200).end();
 });
 
 router.post('/job/delete', (req, res) => {
@@ -90,4 +90,15 @@ router.post('/job/delete', (req, res) => {
   return res.status(400).end();
 });
 
+router.get('/jobs', (req, res) => {
+  // Filters employees for those who have active jobs.
+  // Returns list
+  const activeJobs = employees.reduce((accumulator, employee) => {
+    const active = employee.jobs.filter(job => job.active); // return job if job.active == true
+    if (active.length > 0) accumulator.push({ ...employee, jobs: active });
+    return accumulator;
+  }, []);
+
+  return res.status(200).json(activeJobs).end();
+});
 export default router;

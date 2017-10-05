@@ -1,4 +1,5 @@
 import React from 'react';
+import { InputBox } from './FormComponents';
 
 class SettingsComponents extends React.Component {
   constructor(props) {
@@ -11,9 +12,9 @@ class SettingsComponents extends React.Component {
     };
   }
 
-  updateNewText(e) {
+  updateNewText(t) {
     this.setState({
-      text: e.target.value,
+      text: t,
     });
   }
 
@@ -39,12 +40,11 @@ class SettingsComponents extends React.Component {
                 )
             }
           </ul>
-          <input
-            id="text"
+          <InputBox
+            name="text"
             type="text"
             value={this.state.text}
-            onChange={e => this.updateNewText(e)}
-            onBlur={e => this.updateNewText(e)}
+            onUpdate={text => this.updateNewText(text)}
           />
           <button onClick={() => this.handleAdd()}>Add</button>
         </div>

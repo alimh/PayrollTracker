@@ -4,6 +4,8 @@ import { Layout } from './pages/Layout';
 import { NotFoundPage } from './components/NotFoundPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { EmployeeSearchPage } from './pages/EmployeeSearchPage';
+import { NewPayroll } from './pages/NewPayroll';
+
 // import athletes from '../data/athletes';
 
 // const renderAthlete = ({ match, staticContext }) => {
@@ -22,6 +24,7 @@ export const App = () => (
     <Switch>
       <Route exact path="/settings" render={renderSettings} />
       <Route exact path="/employees" component={EmployeeSearchPage} />
+      <Route exact path="/payroll" component={NewPayroll} />
       <Route component={NotFoundPage} />
     </Switch>
   </Layout>
