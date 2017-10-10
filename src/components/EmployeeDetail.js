@@ -24,17 +24,19 @@ const EmployeeDetail = (props) => {
             <th>Per</th>
             <th />
             <th>Overtime Exempt</th>
+            <th>Category</th>
           </tr>
         </thead>
         <tbody>
           {props.employee.jobs.map((x, n) => (
             <tr key={n.toString()}>
-              <td>{x.role}</td>
+              <td>{x.jobName}</td>
               <td>{x.store}</td>
               <td>{x.rate}</td>
               <td>{x.per}</td>
               <td>{x.maxHours}</td>
               <td>{x.otExempt}</td>
+              <td>{x.category}</td>
               <td><a href="" onClick={e => handleDelete(e, n)}>x</a></td>
             </tr>
         ))}

@@ -45,6 +45,7 @@ class SettingsComponents extends React.Component {
             type="text"
             value={this.state.text}
             onUpdate={text => this.updateNewText(text)}
+            errMsg={this.props.errMsg}
           />
           <button onClick={() => this.handleAdd()}>Add</button>
         </div>

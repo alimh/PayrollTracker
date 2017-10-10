@@ -38,7 +38,8 @@ class EmployeeDetailNewJob extends React.Component {
     this.setState({
       jobDetails: {
         dateCreate: null,
-        role: '',
+        jobName: '',
+        category: '',
         rate: '',
         per: '',
       },
@@ -87,8 +88,8 @@ class EmployeeDetailNewJob extends React.Component {
     return (
       <form id="employee-detail-new-job-form">
         <SelectBox
-          title="Role"
-          onUpdate={text => this.handleUpdate('role', text)}
+          title="Job Title"
+          onUpdate={text => this.handleUpdate('jobName', text)}
           options={this.state.options.roles}
           value={this.state.jobDetails.role}
         />
@@ -102,6 +103,12 @@ class EmployeeDetailNewJob extends React.Component {
           onUpdate={text => this.handleUpdate('per', text)}
           options={this.state.options.pers}
           value={this.state.jobDetails.per}
+        />
+        <SelectBox
+          tilte="Category"
+          onUpdate={text => this.handleUpdate('category', text)}
+          options={this.state.options.categories}
+          value={this.state.jobDetails.category}
         />
         <button onClick={e => this.handleSave(e)}>Save</button>
         <button onClick={e => this.handleCancel(e)}>Cancel</button>
