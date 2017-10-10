@@ -3,6 +3,7 @@ import Axios from 'axios';
 import EmployeeSearch from '../components/EmployeeSearch';
 import EmployeeList from '../components/EmployeeList';
 import EmployeeDetail from '../components/EmployeeDetail';
+import EmployeeNew from '../components/EmployeeNew';
 
 export class EmployeeSearchPage extends React.Component {
   constructor() {
@@ -15,6 +16,8 @@ export class EmployeeSearchPage extends React.Component {
       employee: null,
       errDetail: null,
       jobDetails: null,
+      newEmployeeClicked: false,
+      newEmployeeDetails: null,
     };
   }
 
@@ -50,7 +53,7 @@ export class EmployeeSearchPage extends React.Component {
     });
   }
 
-  handleNew(newJob) {
+  handleNewJob(newJob) {
     // 1. POST info to API
     // 2. Call componentDidMount() to update state?
     const payload = { ...newJob, id: this.state.employee.id };
@@ -64,7 +67,7 @@ export class EmployeeSearchPage extends React.Component {
       });
   }
 
-  handleDelete(n) {
+  handleDeleteJob(n) {
     // 1. POST delete request to API
     // 2. Update state by calling componentDidMOunt() ?
     const payload = { id: this.state.employee.id, job: n };
@@ -77,6 +80,12 @@ export class EmployeeSearchPage extends React.Component {
       });
   }
 
+  handleNewEmployee(employeeDetails) {
+    console.log('Saving new employee');
+    console.log(employeeDetails);
+
+    this.setState({ newEmployeeClicked: false });
+  }
   render() {
     return (
       <div className="page-content">
@@ -91,10 +100,18 @@ export class EmployeeSearchPage extends React.Component {
             employee={this.state.employee}
             jobDetails={this.state.jobDetails}
             errorMsg={this.state.errDetail}
-            onDelete={n => this.handleDelete(n)}
-            onNew={newJob => this.handleNew(newJob)}
+            onDelete={n => this.handleDeleteJob(n)}
+            onNew={newJob => this.handleNewJob(newJob)}
           /> :
           <p>Select an employee</p>
+        }
+        {this.state.newEmployeeClicked ?
+          <EmployeeNew
+            onSave={employeeDetails => this.handleNewEmployee(employeeDetails)}
+          /> :
+          <button onClick={() => { this.setState({ newEmployeeClicked: true }); }}>
+            New Employee
+          </button>
         }
       </div>
     );
