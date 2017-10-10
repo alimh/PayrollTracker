@@ -35,6 +35,12 @@ class EmployeeNew extends React.Component {
     this.props.onSave(this.state.employeeDetails);
   }
 
+  handleCancel(e) {
+    e.preventDefault();
+
+    this.props.onCancel();
+  }
+
   render() {
     return (
       <div>
@@ -60,6 +66,7 @@ class EmployeeNew extends React.Component {
         >
           Save
         </button>
+        <button onClick={e => this.handleCancel(e)}>Cancel</button>
       </div>
     );
   }

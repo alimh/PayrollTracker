@@ -86,6 +86,11 @@ export class EmployeeSearchPage extends React.Component {
 
     this.setState({ newEmployeeClicked: false });
   }
+
+  hanldeCancelNewEmployee() {
+    this.setState({ newEmployeeClicked: false });
+  }
+
   render() {
     return (
       <div className="page-content">
@@ -108,6 +113,7 @@ export class EmployeeSearchPage extends React.Component {
         {this.state.newEmployeeClicked ?
           <EmployeeNew
             onSave={employeeDetails => this.handleNewEmployee(employeeDetails)}
+            onCancel={() => this.hanldeCancelNewEmployee()}
           /> :
           <button onClick={() => { this.setState({ newEmployeeClicked: true }); }}>
             New Employee
