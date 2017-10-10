@@ -1,6 +1,7 @@
 import React from 'react';
 import Axios from 'axios';
 import { NewPayrollToFill } from '../components/NewPayrollToFill';
+import { NewPayrollCompleted } from '../components/NewPayrollCompleted';
 
 const checkError = (x) => {
   const checkNumber = n => parseFloat(n);
@@ -175,6 +176,19 @@ export class NewPayroll extends React.Component {
     }
   }
 
+  handleEdit(indexEmployee) {
+    const newActiveJobs = this.state.activeJobs;
+    const newCompletedJobs = this.state.completedJobs;
+
+    newActiveJobs.push(this.state.completedJobs[indexEmployee]);
+    newCompletedJobs.splice(indexEmployee, 1);
+
+    this.setState({
+      activeJobs: newActiveJobs,
+      completedJobs: newCompletedJobs,
+    });
+  }
+
   render() {
 /* <CompletedPayroll
 jobs={this.state.completedJobs}
@@ -189,8 +203,8 @@ summary={this.state.summary}
         <div className="error">
           <ul>
             {
-              this.state.errMsg.map(error => (
-                <li>{error}</li>
+              this.state.errMsg.map((error, n) => (
+                <li key={n}>{error}</li>
               ))
             }
           </ul>
@@ -208,8 +222,16 @@ summary={this.state.summary}
         }
         {
           this.state.completedJobs.length ?
-            <div>completed payroll</div> :
+            <NewPayrollCompleted
+              jobs={this.state.completedJobs}
+              onEdit={indexEmployee => this.handleEdit(indexEmployee)}
+            /> :
             <div>---</div>
+        }
+        {
+          this.state.completedJobs.length && !this.state.activeJobs.length ?
+            <button onClick="">Submit</button> :
+            <div />
         }
       </div>
     );
