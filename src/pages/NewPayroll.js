@@ -2,6 +2,7 @@ import React from 'react';
 import Axios from 'axios';
 import { NewPayrollToFill } from '../components/NewPayrollToFill';
 import { NewPayrollCompleted } from '../components/NewPayrollCompleted';
+import { PayrollCategorySummary } from '../components/PayrollCategorySummary';
 
 const checkError = (x) => {
   const checkNumber = n => parseFloat(n);
@@ -83,7 +84,7 @@ export class NewPayroll extends React.Component {
 
     Axios.get('/api/employees/jobs').then((res) => {
       const data = res.data;
-
+      console.log(data);
       const blankPayroll = data.reduce((accumulator, employee) => {
         const blankJobs = employee.jobs.reduce((acc, job) => {
           const blankWeekData = new Array(this.state.numWeeks);
@@ -236,6 +237,7 @@ export class NewPayroll extends React.Component {
             <button onClick={() => this.handleSubmit()}>Submit</button> :
             <div />
         }
+        <PayrollCategorySummary jobs={this.state.completedJobs} />
       </div>
     );
   }
