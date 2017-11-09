@@ -1,5 +1,6 @@
 import React from 'react';
 import Axios from 'axios';
+import { Link } from 'react-router-dom';
 import EmployeeSearch from '../components/EmployeeSearch';
 import EmployeeList from '../components/EmployeeList';
 import EmployeeDetail from '../components/EmployeeDetail';
@@ -94,6 +95,7 @@ export class EmployeeSearchPage extends React.Component {
   render() {
     return (
       <div className="page-content">
+        <Link to="/settings">Settings</Link>
         <EmployeeSearch onUpdate={searchText => this.handleSearch(searchText)} />
         {this.state.employeeListFiltered ?
           <EmployeeList
@@ -113,7 +115,7 @@ export class EmployeeSearchPage extends React.Component {
         {this.state.newEmployeeClicked ?
           <EmployeeNew
             onSave={employeeDetails => this.handleNewEmployee(employeeDetails)}
-            onCancel={() => this.hanldeCancelNewEmployee()}
+            onCancel={() => { this.setState({ newEmployeeClicked: false }); }}
           /> :
           <button onClick={() => { this.setState({ newEmployeeClicked: true }); }}>
             New Employee

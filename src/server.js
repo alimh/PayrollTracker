@@ -10,6 +10,7 @@ import bodyParser from 'body-parser';
 import { App } from './App';
 import ApiSettings from './api/settings';
 import ApiEmployees from './api/employees';
+import ApiUser from './api/user';
 
 const app = new Express();
 const server = new Server(app);
@@ -34,12 +35,17 @@ app.use(bodyParser.json());
 
 app.use('/api/settings', ApiSettings);
 app.use('/api/employees', ApiEmployees);
+app.use('/api/user/', ApiUser);
+
+app.use((req, res, next) => {
+  console.log('using'.concat(req.url)); next();
+});
 
 // universal routing and rendering
 app.get('*', (req, res) => {
   let markup = '';
   let status = 200;
-
+  console.log('get: '.concat(req.url));
   if (process.env.UNIVERSAL) {
     const context = {};
     markup = renderToString(
@@ -57,7 +63,6 @@ app.get('*', (req, res) => {
       status = 404;
     }
   }
-
   return res.status(status).render('index', { markup });
 });
 

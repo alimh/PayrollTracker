@@ -18,7 +18,7 @@ export class SettingsPage extends React.Component {
   handleCreate(setting, item) {
     const newSetting = this.state.settings;
     const newErrMsg = this.state.errMsg;
-    
+
     // check to see if item is not blank
     console.log(item === '');
     if (item === '') {

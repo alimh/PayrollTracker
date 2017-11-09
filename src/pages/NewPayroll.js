@@ -9,11 +9,11 @@ const checkError = (x) => {
   const checkNotBlank = n => n !== '';
 
   const notBlank = checkNotBlank(x);
-  if (!notBlank) return 'Cannot be blank';
+  if (!notBlank) return 'cannot be blank';
   const number = checkNumber(x);
-  if (!number && number !== 0) return 'Should be a valid number';
+  if (!number && number !== 0) return 'should be a valid number';
   const positive = checkPositive(x);
-  if (!positive) return 'Should be a number greater than or equal to 0.0';
+  if (!positive) return 'should be a number greater than or equal to 0.0';
   return false;
 };
 
@@ -130,17 +130,24 @@ export class NewPayroll extends React.Component {
   handleSave(indexEmployee) {
     // error check and send back error info
     // if no erros, move employee to completed jobs array
-    console.log('saving: '.concat(indexEmployee));
-    console.log(this.state.activeJobs[indexEmployee]);
-
     const newActiveJobs = this.state.activeJobs;
     const errors = [];
 
     newActiveJobs[indexEmployee].jobs.forEach((job, indexJob) => {
       job.weekData.forEach((data, indexWeek) => {
         const errMsgQ = checkError(data.quantity.value);
-        const errMsgT = checkError(data.totalHours.value);
-        const errMsgE = checkError(data.excessHours.value);
+        const errMsgT =
+          job.per === 'Hour' && data.totalHours.value !== data.quantity.value ?
+            'must equal quantity' :
+            false
+          ||
+          checkError(data.totalHours.value);
+        const errMsgE =
+          data.excessHours.value > data.totalHours.value ?
+            'cannot be greater than total hours' :
+            false
+          ||
+          checkError(data.excessHours.value);
 
         newActiveJobs[indexEmployee].jobs[indexJob].weekData[indexWeek].quantity.errMsg =
           !(errMsgQ !== false);
@@ -149,9 +156,9 @@ export class NewPayroll extends React.Component {
         newActiveJobs[indexEmployee].jobs[indexJob].weekData[indexWeek].excessHours.errMsg =
           !(errMsgE !== false);
 
-        if (errMsgQ) errors.push('Quantity for week '.concat(indexWeek + 1).concat(' ').concat(errMsgQ));
-        if (errMsgT) errors.push('Total hours for week '.concat(indexWeek + 1).concat(' ').concat(errMsgT));
-        if (errMsgE) errors.push('Excess hours for week '.concat(indexWeek + 1).concat(' ').concat(errMsgE));
+        if (errMsgQ) errors.push('Quantity for '.concat(job.jobName).concat(' Week ').concat(indexWeek + 1).concat(' ').concat(errMsgQ));
+        if (errMsgT) errors.push('Total hours for '.concat(job.jobName).concat(' Week ').concat(indexWeek + 1).concat(' ').concat(errMsgT));
+        if (errMsgE) errors.push('Excess hours for '.concat(job.jobName).concat(' Week ').concat(indexWeek + 1).concat(' ').concat(errMsgE));
       });
     });
 
@@ -189,15 +196,11 @@ export class NewPayroll extends React.Component {
     });
   }
 
+  handleSubmit() {
+    console.log(this.state.completedJobs);
+  }
+
   render() {
-/* <CompletedPayroll
-jobs={this.state.completedJobs}
-canSubmit={this.state.canSubmit}
-onSubmit={this.handleSubmit()}
-/>
-<PayrollSummary
-summary={this.state.summary}
-/> */
     return (
       <div className="page-content">
         <div className="error">
@@ -218,7 +221,7 @@ summary={this.state.summary}
                 this.handleUpdate(val, nameField, indexWeek, indexJob, indexEmployee)}
               onSave={i => this.handleSave(i)}
             /> :
-            <div className="loading">Loading...</div>
+            <div className="loading">---</div>
         }
         {
           this.state.completedJobs.length ?
@@ -230,7 +233,7 @@ summary={this.state.summary}
         }
         {
           this.state.completedJobs.length && !this.state.activeJobs.length ?
-            <button onClick="">Submit</button> :
+            <button onClick={() => this.handleSubmit()}>Submit</button> :
             <div />
         }
       </div>

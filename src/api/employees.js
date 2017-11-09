@@ -36,14 +36,12 @@ router.get('/list', (req, res) => {
 
   const data = [];
 
-  employees.map((n) => {
-    const searchString = n.jobs.reduce((s,n) => {
-      return s.concat(n.role).concat(n.store);
-    }, '').concat(n.name);
+  employees.map((emp) => {
+    const searchString = emp.jobs.reduce((s, n) => s.concat(n.role).concat(n.store), '').concat(emp.name);
 
     const listItem = {
-      id: n.id,
-      name: n.name,
+      id: emp.id,
+      name: emp.name,
       search: searchString.toUpperCase(),
     };
     data.push(listItem);
@@ -58,12 +56,12 @@ router.get('/detail/:id', (req, res) => {
   //     return res.status(401).end();
   //   }
     // const token = req.headers.authorization.split(' ')[1];
-  
+
       // jwt.verify(token, 'Secret Key', (err, decoded) => {
       //     if (err) { return res.status(401).end(); }
-  
+
       //     const userId = decoded.sub;
-  
+
       //     req.db.collection('guests').find().toArray((err, docs) => {
       //         if(err) { console.log("error"); res.status(401).end(); }
       //         else {

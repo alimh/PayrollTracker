@@ -37,7 +37,7 @@ const EmployeeDetail = (props) => {
               <td>{x.maxHours}</td>
               <td>{x.otExempt}</td>
               <td>{x.category}</td>
-              <td><a href="" onClick={e => handleDelete(e, n)}>x</a></td>
+              <td><button onClick={e => handleDelete(e, n)}>x</button></td>
             </tr>
         ))}
         </tbody>

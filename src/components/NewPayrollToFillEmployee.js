@@ -6,6 +6,7 @@ export const NewPayrollToFillEmployee = (props) => {
 
   const weekDetail = (index) => {
     const detail = [];
+    const per = props.employee.jobs[index].per;
     for (let i = 0; i < props.weeks; i += 1) {
       detail.push((
         <td style={style} key={i.toString().concat('-quanitity')}>
@@ -14,7 +15,7 @@ export const NewPayrollToFillEmployee = (props) => {
             value={props.employee.jobs[index].weekData[i].quantity.value}
             onUpdate={val => props.onUpdate(val, 'quantity', i, index)}
             errMsg={props.employee.jobs[index].weekData[i].quantity.errMsg === false}
-            placeholder={props.employee.jobs[index].per}
+            placeholder={per}
           />
         </td>
       ));
@@ -47,7 +48,7 @@ export const NewPayrollToFillEmployee = (props) => {
     <tr>
       <td key="name" style={style}>{index === 0 ? props.employee.name : ''}</td>
       <td key="store" style={style}>{props.employee.jobs[index].store}</td>
-      <td key="role" style={style}>{props.employee.jobs[index].role}</td>
+      <td key="role" style={style}>{props.employee.jobs[index].jobName}</td>
       <td key="rate" style={style}>
         {props.employee.jobs[index].rate} / {props.employee.jobs[index].per}
       </td>

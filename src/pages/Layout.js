@@ -8,6 +8,9 @@ export const Layout = props => (
     </header>
     <div className="app-content">{props.children}</div>
     <footer>
+      <Link to="/settings">Settings</Link>
+      <Link to="/payroll">Payroll</Link>
+      <Link to="/employees">Employees</Link>
       <p>
         Footer
       </p>
