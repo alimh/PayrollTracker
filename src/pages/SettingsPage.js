@@ -52,9 +52,20 @@ export class SettingsPage extends React.Component {
     const index = this.state.settings[setting].indexOf(item);
     const newSetting = this.state.settings;
     const newErrMsg = this.state.errMsg;
-    newSetting[setting].splice(index, 1);
-    newErrMsg[setting] = null;
-    this.setState({ settings: newSetting, errMsg: newErrMsg });
+
+    const authorizationHeader = 'bearer '.concat(Auth.getToken());
+    const payload = {
+      category: setting,
+      value: item,
+    };
+
+    Axios.post('/api/settings/remove', payload, { headers: { Authorization: authorizationHeader } })
+      .then(() => {
+        newSetting[setting].splice(index, 1);
+        newErrMsg[setting] = null;
+        this.setState({ settings: newSetting, errMsg: newErrMsg });
+      })
+      .catch(err => this.setState({ errMsg: err }));
   }
 
   render() {
