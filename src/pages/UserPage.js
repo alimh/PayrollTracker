@@ -10,20 +10,31 @@ export class UserPage extends React.Component {
   }
 
   componentDidMount() {
-    const authenticated = Auth.isUserAuthenticated();
-    if (authenticated) {
-      const tokens = Auth.getToken();
-      console.log(tokens);
-      // check server to see if token is valid.
-      //  if yes, this.props.updateTokens...
-      //  if no, ?
-      this.props.updateTokens(tokens);
+    const tokenPresent = Auth.isUserAuthenticated();
+    if (tokenPresent) {
+      console.log('calling check-token');
+      const authorizationHeader = 'bearer '.concat(Auth.getToken());
+      Axios.get('/api/user/check-token', {
+        headers: { Authorization: authorizationHeader } })
+        .then((res) => {
+          if (res.data.success) {
+            const tokenNew = res.data.token;
+            Auth.authenticateUser(tokenNew);
+            this.props.tokenValid(res.data.userName);
+          } else {
+            const errMsg = res.data.errMsg;
+            this.setState({ errMsg });
+          }
+        }).catch((res) => {
+          const errMsg = res.toString();
+          this.setState({ errMsg });
+          this.props.tokenValid(false);
+        });
     }
   }
 
-  componentWillReceiveProps() {
-    console.log('receiving props');
-    this.setState({ errMsg: this.props.errMsg });
+  componentWillReceiveProps(nextProps) {
+    this.setState({ errMsg: nextProps.errMsg });
   }
 
   handleLogin() {
@@ -31,9 +42,9 @@ export class UserPage extends React.Component {
     Axios.post('/api/user/login', payload)
       .then((res) => {
         if (res.data.success) {
-          const tokens = { Api: res.data.tokenAPI, Refresh: res.data.tokenRefresh };
-          Auth.authenticateUser(tokens);
-          this.props.updateTokens(tokens);
+          const token = res.data.token;
+          Auth.authenticateUser(token);
+          this.props.tokenValid(res.data.userName);
         } else {
           const errMsg = res.data.errMsg;
           this.setState({ errMsg });
@@ -47,15 +58,14 @@ export class UserPage extends React.Component {
 
   handleLogout() {
     Auth.deauthenticateUser();
-    this.props.updateTokens(null);
+    this.props.tokenValid(false);
   }
 
   render() {
-    console.log(this.props.tokens);
     return (
       <div className="page-content">
         {
-          this.props.tokens ?
+          this.props.authenticated ?
             <button onClick={() => this.handleLogout()}>Logout</button> :
             <div id="login-form">
               <div className="error-message">{this.state.errMsg}</div>

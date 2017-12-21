@@ -1,41 +1,38 @@
 import express from 'express';
-
-// import jwt from 'jsonwebtoken';
+import Settings from '../models/settings';
 
 const router = new express.Router();
 
-// router.post('/rsvp', (req, res) => {
-//   const guests = req.body;
-//   req.db.collection('guests').insertOne(guests, (err, result) => {
-//     if (!err) {
-//       res.json(result);
-//     }
-//   });
-// });
-
 router.get('/all', (req, res) => {
-//   if (!req.headers.authorization) {
-//     return res.status(401).end();
-//   }
-  // const token = req.headers.authorization.split(' ')[1];
+  Settings.find({}, (err, settings) => {
+    if (err) {
+      return res.status(403).end();
+    }
 
-    // jwt.verify(token, 'Secret Key', (err, decoded) => {
-    //     if (err) { return res.status(401).end(); }
+    const settingsObj = settings.reduce((acc, s) => {
+      const temp = {};
+      const current = acc[s.settingsCategory] ? [...acc[s.settingsCategory]] : [];
+      current.push(s.settingsValue);
+      temp[s.settingsCategory] = current;
+      return { ...acc, ...temp };
+    }, {});
 
-    //     const userId = decoded.sub;
+//      Categories: ['Baker', 'Finisher', 'Crew', 'Maintenance'],
+    return res.status(200).json(settingsObj).end();
+  });
+});
 
-    //     req.db.collection('guests').find().toArray((err, docs) => {
-    //         if(err) { console.log("error"); res.status(401).end(); }
-    //         else {
-    //             res.status(200).json(docs).end();
-    //         }
-    //     });
-    // });
-  const data = {
-    PCs: ['304248', '302254'],
-    Categories: ['Baker', 'Finisher', 'Crew', 'Maintenance'],
-  };
-  return res.status(200).json(data).end();
+router.post('/update', (req, res) => {
+  const newSetting = Settings({
+    settingsCategory: req.body.category,
+    settingsValue: req.body.value,
+  });
+
+  newSetting.save((err) => {
+    if (err) throw err;
+  });
+
+  return res.status(200).end();
 });
 
 router.get('/job-options', (req, res) => {

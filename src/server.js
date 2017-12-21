@@ -7,13 +7,18 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter as Router } from 'react-router-dom';
 import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
 import { App } from './App';
 import ApiSettings from './api/settings';
 import ApiEmployees from './api/employees';
 import ApiUser from './api/user';
+import checkAuth from './server/checkauth';
 
 const app = new Express();
 const server = new Server(app);
+
+mongoose.Promise = Promise;
+mongoose.connect('mongodb://localhost/testDB');
 
 // use ejs templates
 app.set('view engine', 'ejs');
@@ -25,21 +30,18 @@ app.use(Express.static(path.join(__dirname, 'static')));
 
 app.use(bodyParser.json());
 
-// app.use('/api/settings', (req, res) => {
-//   const data = {
-//     PCs: ['304248', '302254'],
-//     Roles: ['Baker', 'Finisher', 'Crew', 'Maintenance'],
-//   };
-//   return res.status(200).json(data).end();
-// });
-
-app.use('/api/settings', ApiSettings);
-app.use('/api/employees', ApiEmployees);
-app.use('/api/user/', ApiUser);
-
 app.use((req, res, next) => {
   console.log('using'.concat(req.url)); next();
 });
+
+console.log('Calling checkAuth');
+app.use('/api', checkAuth);
+console.log('FInished checkAuth, calling route middleware');
+
+app.use('/api/settings', ApiSettings);
+app.use('/api/employees', ApiEmployees);
+app.use('/api/user', ApiUser);
+console.log('Finished calling route middleware');
 
 // universal routing and rendering
 app.get('*', (req, res) => {

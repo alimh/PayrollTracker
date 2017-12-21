@@ -1,23 +1,15 @@
 import jwt from 'jsonwebtoken';
 import secretkey from './secretkey';
 
-export const tokenAPI = (data) => {
+export const token = (user) => {
   const payload = {
-    sub: data,
+    sub: user,
   };
-  const token = jwt.sign(payload, secretkey, {
+  const tokenSigned = jwt.sign(payload, secretkey, {
     expiresIn: '30min',
   });
 
-  return token;
+  return tokenSigned;
 };
 
-export const tokenRefresh = () => {
-  const payload = {
-  };
-  const token = jwt.sign(payload, secretkey, {
-    expiresIn: '24hrs',
-  });
-
-  return token;
-};
+export default token;

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const settingsSchema = new Schema({
-  settingsName: String,
+  settingsCategory: String,
   settingsValue: String,
   created_at: Date,
   removed_at: Date,

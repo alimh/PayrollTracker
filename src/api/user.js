@@ -1,7 +1,5 @@
 import express from 'express';
-import { tokenAPI, tokenRefresh } from '../server/gettoken';
-
-// import jwt from 'jsonwebtoken';
+import { token } from '../server/gettoken';
 
 const router = new express.Router();
 
@@ -10,45 +8,23 @@ router.post('/login', (req, res) => {
   return payload.userName === payload.password ?
     res.status(200).json({
       success: true,
-      tokenAPI: tokenAPI(payload.userName),
-      tokenRefresh: tokenRefresh(),
+      token: token(payload.userName),
+      userName: payload.userName,
     }).end() :
     res.status(200).json({
       success: false,
+      userName: false,
       errMsg: 'Username and Password do not match',
     }).end();
 });
 
-router.get('/all', (req, res) => {
-//   if (!req.headers.authorization) {
-//     return res.status(401).end();
-//   }
-  // const token = req.headers.authorization.split(' ')[1];
-
-    // jwt.verify(token, 'Secret Key', (err, decoded) => {
-    //     if (err) { return res.status(401).end(); }
-
-    //     const userId = decoded.sub;
-
-    //     req.db.collection('guests').find().toArray((err, docs) => {
-    //         if(err) { console.log("error"); res.status(401).end(); }
-    //         else {
-    //             res.status(200).json(docs).end();
-    //         }
-    //     });
-    // });
-  const data = {
-    PCs: ['304248', '302254'],
-    Categories: ['Baker', 'Finisher', 'Crew', 'Maintenance'],
-  };
-  return res.status(200).json(data).end();
+router.get('/check-token', (req, res) => {
+  console.log(req.locals);
+  return res.status(200).json({
+    success: true,
+    token: res.locals.token,
+    userName: res.locals.userName,
+  }).end();
 });
 
-router.get('/job-options', (req, res) => {
-  const data = {
-    pers: ['Hour', 'Shift', 'Mile', 'Week'],
-    categories: ['Baker', 'Finisher', 'Crew', 'Maintenance'],
-  };
-  return res.status(200).json(data).end();
-});
 export default router;

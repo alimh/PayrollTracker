@@ -1,6 +1,7 @@
 import React from 'react';
 import Axios from 'axios';
 import SettingsComponents from '../components/SettingsComponents';
+import Auth from '../static/js/Auth';
 
 export class SettingsPage extends React.Component {
   constructor() {
@@ -9,27 +10,42 @@ export class SettingsPage extends React.Component {
   }
 
   componentDidMount() {
-    Axios.get('/api/settings/all').then((response) => {
-      const data = response.data;
-      this.setState({ settings: data });
-    });
+    const authorizationHeader = 'bearer '.concat(Auth.getToken());
+    Axios.get('/api/settings/all', { headers: { Authorization: authorizationHeader } })
+      .then((response) => {
+        const data = response.data;
+        this.setState({ settings: data });
+      })
+      .catch((response) => {
+        console.log('caught error'.concat(response));
+        const newErrMsg = this.state.errMsg;
+        newErrMsg.main = 'Server Error: '.concat(response);
+        this.setState({ errMsg: newErrMsg });
+      });
   }
 
   handleCreate(setting, item) {
-    const newSetting = this.state.settings;
-    const newErrMsg = this.state.errMsg;
-
     // check to see if item is not blank
-    console.log(item === '');
     if (item === '') {
+      const newErrMsg = this.state.errMsg;
       newErrMsg[setting] = 'Cannot be blank';
+      this.setState({ errMsg: newErrMsg });
     } else {
-      newSetting[setting] = [...this.state.settings[setting], item];
-      newErrMsg[setting] = null;
+      const authorizationHeader = 'bearer '.concat(Auth.getToken());
+      const payload = {
+        category: setting,
+        value: item,
+      };
+      Axios.post('/api/settings/update', payload, { headers: { Authorization: authorizationHeader } })
+        .then(() => {
+          const newSetting = this.state.settings;
+          newSetting[setting] = [...this.state.settings[setting], item];
+          const newErrMsg = this.state.errMsg;
+          newErrMsg[setting] = null;
+          return this.setState({ settings: newSetting, errMsg: newErrMsg });
+        })
+        .catch(err => this.setState({ errMsg: err }));
     }
-    console.log(newErrMsg);
-    this.setState({ settings: newSetting, errMsg: newErrMsg });
-    // Axios.post('api/settings/update');
   }
 
   handleDisable(setting, item) {
@@ -42,28 +58,27 @@ export class SettingsPage extends React.Component {
   }
 
   render() {
-    console.log(this.state);
     return this.state.settings ? (
-      <div className="page-content">
-        <SettingsComponents
-          header="PCs"
-          content={this.state.settings.PCs}
-          onCreate={item => this.handleCreate('PCs', item)}
-          onDisable={item => this.handleDisable('PCs', item)}
-          errMsg={this.state.errMsg.PCs}
-        />
-        <SettingsComponents
-          header="Categories"
-          content={this.state.settings.Categories}
-          onCreate={item => this.handleCreate('Categories', item)}
-          onDisable={item => this.handleDisable('Categories', item)}
-          errMsg={this.state.errMsg.Categories}
-        />
+      <div>
+        <p>start of settings</p>
+        {
+          Object.keys(this.state.settings).map(comp => (
+            <SettingsComponents
+              key={comp}
+              header={comp}
+              content={this.state.settings[comp]}
+              onCreate={item => this.handleCreate(comp, item)}
+              onDisable={item => this.handleDisable(comp, item)}
+              errMsg={this.state.errMsg[comp]}
+            />
+          ))
+        }
       </div>
-      ) : (
-        <div className="page-content">
-          <p>Retreiving data...</p>
-        </div>
+    ) : (
+      <div className="page-content">
+        <p>Retreiving data...</p>
+        <p>{this.state.errMsg.main}</p>
+      </div>
     );
   }
 }

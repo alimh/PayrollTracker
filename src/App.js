@@ -7,55 +7,39 @@ import { EmployeeSearchPage } from './pages/EmployeeSearchPage';
 import { NewPayroll } from './pages/NewPayroll';
 import { UserPage } from './pages/UserPage';
 
-// import athletes from '../data/athletes';
-
-// const renderAthlete = ({ match, staticContext }) => {
-//   const id = match.params.id;
-//   const athlete = athletes.find(current => current.id === id);
-//   if (!athlete) {
-//     return <NotFoundPage staticContext={staticContext} />;
-//   }
-
-//   return <AthletePage athlete={athlete} athletes={athletes} />;
-// };
-
-// const renderSettings = () => { console.log('rendering settings'); return <SettingsPage />; };
-
-// export const App = () => (
 export class App extends React.Component {
   constructor() {
     super();
-    this.state = ({ authenticated: false, tokens: null });
+    this.state = ({ authenticated: false });
   }
 
-  updateTokens(tokens) {
-    // if (tokens) Auth.authenticateUser(tokens);
-    // else Auth.deauthenticateUser();
-    const newState = {
-      authenticated: tokens !== null,
-      tokens,
-    };
-    this.setState(newState);
+  tokenValid(isTokenValid) {
+    this.setState({ authenticated: isTokenValid });
   }
 
   render() {
     const renderUserPage = props =>
-      <UserPage tokens={this.state.tokens} updateTokens={tokens => this.updateTokens(tokens)} {...props} />;
+      (
+        <UserPage
+          authenticated={this.state.authenticated}
+          tokenValid={isTokenValid => this.tokenValid(isTokenValid)}
+          {...props}
+        />
+      );
     const renderSettings =
-      <SettingsPage tokens={this.state.tokens} updateTokens={this.updateToken} />;
+      <SettingsPage tokenValid={isTokenValid => this.tokenValid(isTokenValid)} />;
     const renderEmployees =
-      <EmployeeSearchPage tokens={this.state.tokens} updateTokens={this.updateToken} />;
+      <EmployeeSearchPage tokenValid={isTokenValid => this.tokenValid(isTokenValid)} />;
     const renderPayroll =
-      <NewPayroll tokens={this.state.tokens} updateTokens={this.updateToken} />;
+      <NewPayroll tokenValid={isTokenValid => this.tokenValid(isTokenValid)} />;
 
     const authenticateRoute = (route) => {
-      console.log('calling authentication');
       const auth = this.state.authenticated;
-      return auth ? route : renderUserPage({ errMsg: 'You need to be logged in to do that' });
+      return auth ? route : renderUserPage({ errMsg: 'You need to be logged in to do that.' });
     };
 
     return (
-      <Layout>
+      <Layout authenticated={this.state.authenticated}>
         <Switch>
           <Route exact path="/user" render={renderUserPage} />
           <Route exact path="/settings" render={() => authenticateRoute(renderSettings)} />
