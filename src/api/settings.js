@@ -17,7 +17,6 @@ router.get('/all', (req, res) => {
       return { ...acc, ...temp };
     }, {});
 
-//      Categories: ['Baker', 'Finisher', 'Crew', 'Maintenance'],
     return res.status(200).json(settingsObj).end();
   });
 });

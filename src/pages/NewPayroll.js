@@ -3,6 +3,7 @@ import Axios from 'axios';
 import { NewPayrollToFill } from '../components/NewPayrollToFill';
 import { NewPayrollCompleted } from '../components/NewPayrollCompleted';
 import { PayrollCategorySummary } from '../components/PayrollCategorySummary';
+import Auth from '../static/js/Auth';
 
 const checkError = (x) => {
   const checkNumber = n => parseFloat(n);
@@ -81,45 +82,48 @@ export class NewPayroll extends React.Component {
     // get initial data from API
     //  this data consists of employees and their jobs
     // Map these jobs to the activeJob state var
-
-    Axios.get('/api/employees/jobs').then((res) => {
-      const data = res.data;
-      console.log(data);
-      const blankPayroll = data.reduce((accumulator, employee) => {
-        const blankJobs = employee.jobs.reduce((acc, job) => {
-          const blankWeekData = new Array(this.state.numWeeks);
-          for (let i = 0; i < this.state.numWeeks; i += 1) {
-            blankWeekData[i] = {
-              quantity: {
-                value: [''],
-                errMsg: [''],
-              },
-              totalHours: {
-                value: [''],
-                errMsg: [''],
-              },
-              excessHours: {
-                value: [''],
-                errMsg: [''],
-              },
-              regularPay: [0],
-              otPay: [0],
-            };
-          }
-          acc.push({
-            ...job,
-            weekData: blankWeekData,
-          });
-          return acc;
+    const authorizationHeader = 'bearer '.concat(Auth.getToken());
+    Axios.get('/api/employees/jobs', { headers: { Authorization: authorizationHeader } })
+      .then((res) => {
+        const data = res.data;
+        console.log(data);
+        const blankPayroll = data.reduce((accumulator, employee) => {
+          const blankJobs = employee.jobs.reduce((acc, job) => {
+            const blankWeekData = new Array(this.state.numWeeks);
+            for (let i = 0; i < this.state.numWeeks; i += 1) {
+              blankWeekData[i] = {
+                quantity: {
+                  value: [''],
+                  errMsg: [''],
+                },
+                totalHours: {
+                  value: [''],
+                  errMsg: [''],
+                },
+                excessHours: {
+                  value: [''],
+                  errMsg: [''],
+                },
+                regularPay: [0],
+                otPay: [0],
+              };
+            }
+            acc.push({
+              ...job,
+              weekData: blankWeekData,
+            });
+            return acc;
+          }, []);
+          const pp = new Array(this.state.numWeeks).fill(0);
+          accumulator.push({ ...employee, jobs: blankJobs, premiumPay: pp });
+          return accumulator;
         }, []);
-        const pp = new Array(this.state.numWeeks).fill(0);
-        accumulator.push({ ...employee, jobs: blankJobs, premiumPay: pp });
-        return accumulator;
-      }, []);
-      this.setState({ activeJobs: blankPayroll });
-    }).catch((reason) => {
-      this.setState({ errMsg: reason.toString() });
-    });
+        console.log(blankPayroll);
+        this.setState({ activeJobs: blankPayroll });
+      }).catch((reason) => {
+        console.log('error');
+        this.setState({ errMsg: reason.toString() });
+      });
   }
 
   handleUpdate(val, nameField, indexWeek, indexJob, indexEmployee) {
@@ -202,6 +206,7 @@ export class NewPayroll extends React.Component {
   }
 
   render() {
+    console.log(this.state);
     return (
       <div className="page-content">
         <div className="error">
