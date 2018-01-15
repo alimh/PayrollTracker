@@ -11,8 +11,8 @@ const EmployeeList = (props) => {
       <h4>List</h4>
       <ul>
         {props.list.map(x => (
-          <li key={x.id}>
-            <button type="link" onClick={e => handleClick(e, x.id)}>{x.name}</button>
+          <li key={x._id}>
+            <button type="link" onClick={e => handleClick(e, x._id)}>{x.name}</button>
           </li>
         ))}
       </ul>

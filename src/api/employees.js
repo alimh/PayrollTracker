@@ -1,4 +1,6 @@
 import express from 'express';
+import Employee from '../models/employees';
+
 
 // import jwt from 'jsonwebtoken';
 import employees from '../data/employees';
@@ -15,77 +17,67 @@ const router = new express.Router();
 // });
 
 router.get('/list', (req, res) => {
-//   if (!req.headers.authorization) {
-//     return res.status(401).end();
-//   }
-  // const token = req.headers.authorization.split(' ')[1];
+  Employee.find({ inactivatedDate: null }, (err, employee) => {
+    if (err) {
+      return res.status(403).end();
+    }
 
-    // jwt.verify(token, 'Secret Key', (err, decoded) => {
-    //     if (err) { return res.status(401).end(); }
-
-    //     const userId = decoded.sub;
-
-    //     req.db.collection('guests').find().toArray((err, docs) => {
-    //         if(err) { console.log("error"); res.status(401).end(); }
-    //         else {
-    //             res.status(200).json(docs).end();
-    //         }
-    //     });
-    // });
-  console.log('called employees/list');
-
-  const data = [];
-
-  employees.map((emp) => {
-    const searchString = emp.jobs.reduce((s, n) => s.concat(n.role).concat(n.store), '').concat(emp.name);
-
-    const listItem = {
-      id: emp.id,
-      name: emp.name,
-      search: searchString.toUpperCase(),
-    };
-    data.push(listItem);
-    return true;
+    return res.status(200).json(employee).end();
   });
-
-  return res.status(200).json(data).end();
 });
 
 router.get('/detail/:id', (req, res) => {
-  //   if (!req.headers.authorization) {
-  //     return res.status(401).end();
-  //   }
-    // const token = req.headers.authorization.split(' ')[1];
+  Employee.findById(req.params.id, (err, employee) => {
+    if (err) {
+      return res.status(403).end();
+    }
+    console.log(employee);
+    return res.status(200).json(employee).end();
+  });
+});
 
-      // jwt.verify(token, 'Secret Key', (err, decoded) => {
-      //     if (err) { return res.status(401).end(); }
+router.post('/new', (req, res) => {
+  const newEmployee = Employee({
+    name: req.body.name,
+    hireDate: new Date(req.body.hireDate),
+    created_at: new Date(),
+  });
 
-      //     const userId = decoded.sub;
+  Employee.create(newEmployee, (err, emp) => {
+    if (err) return res.status(403).send('Error test message');
+    return res.status(200).json(emp).end();
+  });
 
-      //     req.db.collection('guests').find().toArray((err, docs) => {
-      //         if(err) { console.log("error"); res.status(401).end(); }
-      //         else {
-      //             res.status(200).json(docs).end();
-      //         }
-      //     });
-      // });
-  const id = Number(req.params.id);
-  const data = id ? employees.find(n => n.id === id) : null;
-
-  return res.status(200).json(data).end();
+  // return res.status(200).end();
 });
 
 router.post('/job/new', (req, res) => {
-  console.log(req.body);
+  const newJob = {
+    job: req.body.job,
+    rate: req.body.rate,
+    per: req.body.per,
+    pc: req.body.pc,
+    maxHours: req.body.maxHours,
+    otExempt: req.body.otExempt,
+    created_at: new Date(),
+  };
 
-  return res.status(200).end();
+  Employee.findByIdAndUpdate(
+    req.body.id,
+    { $push: { jobs: newJob } },
+    { new: true },
+    (err) => {
+      if (err) return res.status(403).json(err).end();
+      return res.status(200).end();
+    },
+  );
 });
 
 router.post('/job/delete', (req, res) => {
   console.log('got post request to delete');
   console.log(req.body);
 
-  return res.status(400).end();
+  return res.status(200).end();
 });
 
 router.get('/jobs', (req, res) => {

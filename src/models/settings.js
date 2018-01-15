@@ -9,6 +9,6 @@ const settingsSchema = new Schema({
   removed_at: Date,
 });
 
-const Settings = mongoose.model('Settings', settingsSchema);
+const Settings = mongoose.model('Setting', settingsSchema);
 
 export default Settings;

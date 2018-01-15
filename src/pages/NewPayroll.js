@@ -3,7 +3,7 @@ import Axios from 'axios';
 import { NewPayrollToFill } from '../components/NewPayrollToFill';
 import { NewPayrollCompleted } from '../components/NewPayrollCompleted';
 import { PayrollCategorySummary } from '../components/PayrollCategorySummary';
-import Auth from '../static/js/Auth';
+import Auth from '../utils/Auth';
 
 const checkError = (x) => {
   const checkNumber = n => parseFloat(n);

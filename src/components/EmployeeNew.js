@@ -1,9 +1,10 @@
 import React from 'react';
 import { InputBox } from './FormComponents';
+import { checkNotBlankError, checkValidDateError } from '../utils/FormValidation';
 
 const noErrors = (obj) => {
   // check to make sure name and hireDate have been entered and there are no errors
-  const r = obj.name !== null || obj.hireDate !== null;
+  const r = obj.name !== false || (obj.hireDate !== false && obj.hireDate !== undefined);
   return !r;
 };
 
@@ -16,6 +17,10 @@ class EmployeeNew extends React.Component {
         name: '',
         hireDate: '',
       },
+      errorChecks: {
+        name: t => checkNotBlankError(t),
+        hireDate: t => t !== '' && checkValidDateError(t),
+      },
       errMsg: { initial: true },  //errors
     };
   }
@@ -23,7 +28,7 @@ class EmployeeNew extends React.Component {
   handleUpdate(field, text) {
     const newEmployeeDetails = { ...this.state.employeeDetails, [field]: text };
     const newErrMsg = { ...this.state.errMsg,
-      [field]: text ? null : 'Cannot be blank',
+      [field]: this.state.errorChecks[field](text),
       initial: null,
     };
     this.setState({ employeeDetails: newEmployeeDetails, errMsg: newErrMsg });
@@ -62,7 +67,10 @@ class EmployeeNew extends React.Component {
         />
         <button
           onClick={e => this.handleSave(e)}
-          disabled={!noErrors(this.state.errMsg)}
+          disabled={
+            this.state.errMsg.name !== false ||
+            (this.state.errMsg.hireDate !== false && this.state.errMsg.hireDate !== undefined)
+          }
         >
           Save
         </button>

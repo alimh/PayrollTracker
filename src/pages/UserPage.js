@@ -1,7 +1,7 @@
 import React from 'react';
 import Axios from 'axios';
 import { InputBox } from '../components/FormComponents';
-import Auth from '../static/js/Auth';
+import Auth from '../utils/Auth';
 
 export class UserPage extends React.Component {
   constructor(props) {

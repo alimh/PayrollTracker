@@ -31,7 +31,8 @@ app.use(Express.static(path.join(__dirname, 'static')));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
-  console.log('using'.concat(req.url)); next();
+  console.log('using'.concat(req.url));
+  next();
 });
 
 console.log('Calling checkAuth');

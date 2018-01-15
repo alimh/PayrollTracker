@@ -1,7 +1,7 @@
 import React from 'react';
 import Axios from 'axios';
 import SettingsComponents from '../components/SettingsComponents';
-import Auth from '../static/js/Auth';
+import Auth from '../utils/Auth';
 
 export class SettingsPage extends React.Component {
   constructor() {
