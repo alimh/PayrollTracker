@@ -35,7 +35,7 @@ export class EmployeeSearchPage extends React.Component {
   handleSearch(searchText) {
     const searchUpper = searchText.toString().toUpperCase();
     const listNew = this.state.employeeList.filter((e) => {
-      const keys = e.search;
+      const keys = e.search.toUpperCase();
       return keys.indexOf(searchUpper) !== -1;
     });
 

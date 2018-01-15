@@ -3,7 +3,7 @@ import Employee from '../models/employees';
 
 
 // import jwt from 'jsonwebtoken';
-import employees from '../data/employees';
+//import employees from '../data/employees';
 
 const router = new express.Router();
 
@@ -17,12 +17,22 @@ const router = new express.Router();
 // });
 
 router.get('/list', (req, res) => {
-  Employee.find({ inactivatedDate: null }, (err, employee) => {
+  Employee.find({ inactivatedDate: null }, (err, employees) => {
     if (err) {
       return res.status(403).end();
     }
 
-    return res.status(200).json(employee).end();
+    const employeesWithSearch = employees.map((emp) => {
+      const search = emp.jobs.length > 0 ?
+        emp.jobs.reduce(
+          (acc, job) => acc.concat(job.job.concat(job.per.concat(job.pc.toString()))),
+          emp.name,
+        ) :
+        emp.name;
+      return { ...emp._doc, search };
+    });
+
+    return res.status(200).json(employeesWithSearch).end();
   });
 });
 
