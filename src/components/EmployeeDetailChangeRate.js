@@ -16,6 +16,18 @@ class EmployeeDetailChangeRate extends React.Component {
     };
   }
 
+  componentWillReceiveProps() {
+    this.resetForm();
+  }
+
+  resetForm() {
+    this.setState({
+      rate: '',
+      comment: '',
+      errMsg: { },
+    });
+  }
+
   handleUpdate(field, text) {
     const newErrMsg = {
       ...this.state.errMsg,
@@ -51,6 +63,7 @@ class EmployeeDetailChangeRate extends React.Component {
   }
 
   render() {
+    console.log(this.props);
     return (
       <div>
         <div>
@@ -104,7 +117,6 @@ class EmployeeDetailChangeRate extends React.Component {
       </div>
     );
   }
-
 }
 
 export default EmployeeDetailChangeRate;

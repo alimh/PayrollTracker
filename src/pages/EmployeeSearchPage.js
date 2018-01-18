@@ -11,10 +11,10 @@ export class EmployeeSearchPage extends React.Component {
     super();
 
     this.state = {
-      employeeList: null,
-      employeeListFiltered: null,
+      employeeList: null,         // complete list of employees
+      employeeListFiltered: null, // filtered list based on search
       employeeDetailStatus: null,
-      employee: null,
+      employee: null,             // currently selected employee
       errMsg: null,
       jobDetails: null,
       newEmployeeClicked: false,
@@ -66,8 +66,8 @@ export class EmployeeSearchPage extends React.Component {
     const authorizationHeader = 'bearer '.concat(Auth.getToken());
     Axios.post('/api/employees/job/new', payload, { headers: { Authorization: authorizationHeader } })
       .then(() => {
-        this.setState({ jobDetails: null });
-        this.handleSelect(this.state.employee._id);
+        // this.setState({ this.set.toUpperCasejobDetails: null });
+        // this.handleSelect(this.state.employee._id);
       })
       .catch((res) => {
         this.setState({ errMsg: 'Server error: '.concat(res), jobDetails: newJob });
@@ -79,9 +79,8 @@ export class EmployeeSearchPage extends React.Component {
     const authorizationHeader = 'bearer '.concat(Auth.getToken());
     Axios.post('/api/employees/job/changerate', payload, { headers: { Authorization: authorizationHeader } })
     .then(() => {
-      console.log('success');
-//      this.setState({ jobDetails: null });
-  //    this.handleSelect(this.state.employee._id);
+      // this.setState({ employee: updateEmployee });
+      this.handleSelect(this.state.employee._id);
     })
     .catch((res) => {
       this.setState({ errMsg: 'Server error: '.concat(res) });
@@ -108,7 +107,8 @@ export class EmployeeSearchPage extends React.Component {
     Axios.post('/api/employees/new', payload, { headers: { Authorization: authorizationHeader } })
       .then((res) => {
         const newEmployeeList = this.state.employeeList;
-        newEmployeeList.push(res.data);
+        const newEmployee = { ...res.data, search: res.data.name };
+        newEmployeeList.push(newEmployee);
 
         this.setState({
           employeeList: newEmployeeList,
@@ -116,9 +116,8 @@ export class EmployeeSearchPage extends React.Component {
           newEmployeeClicked: false,
           errMsg: null,
         });
-      },
-      (err) => {
-        this.setState({ errMsg: 'Could not create new employee: '.concat(err.response) });
+
+        this.handleSelect(newEmployee._id);
       })
       .catch((error) => {
         this.setState({ errMsg: 'Could not create new employee: '.concat(error) });
@@ -134,29 +133,37 @@ export class EmployeeSearchPage extends React.Component {
       <div className="page-content">
         <div className="error-message">{this.state.errMsg}</div>
         <EmployeeSearch onUpdate={searchText => this.handleSearch(searchText)} />
-        {this.state.employeeListFiltered ?
-          <EmployeeList
-            list={this.state.employeeListFiltered}
-            onSelect={id => this.handleSelect(id)}
-          /> : <p>Retreiving list of employees...</p>}
-        {this.state.employee ?
-          <EmployeeDetail
-            employee={this.state.employee}
-            jobDetails={this.state.jobDetails}
-            onDelete={n => this.handleDeleteJob(n)}
-            onNew={newJob => this.handleNewJob(newJob)}
-            onChangeRate={(id, n, rateChange) => this.handleChangeRate(id, n, rateChange)}
-          /> :
-          <p>Select an employee</p>
+        {
+          this.state.employeeListFiltered ?
+            <EmployeeList
+              list={this.state.employeeListFiltered}
+              onSelect={id => this.handleSelect(id)}
+            /> :
+            <p>Retreiving list of employees...</p>
         }
-        {this.state.newEmployeeClicked ?
-          <EmployeeNew
-            onSave={employeeDetails => this.handleNewEmployee(employeeDetails)}
-            onCancel={() => { this.setState({ newEmployeeClicked: false }); }}
-          /> :
-          <button onClick={() => { this.setState({ newEmployeeClicked: true }); }}>
-            New Employee
-          </button>
+        {
+          this.state.employee ?
+            <EmployeeDetail
+              employee={this.state.employee}
+              jobDetails={this.state.jobDetails}
+              onDelete={n => this.handleDeleteJob(n)}
+              onNew={newJob => this.handleNewJob(newJob)}
+              onChangeRate={(id, n, rateChange) => this.handleChangeRate(id, n, rateChange)}
+            /> :
+            <p>Select an employee</p>
+        }
+        {
+          this.state.newEmployeeClicked ?
+            <EmployeeNew
+              onSave={employeeDetails => this.handleNewEmployee(employeeDetails)}
+              onCancel={() => { this.setState({ newEmployeeClicked: false }); }}
+            /> :
+            <button onClick={
+                () => { this.setState({ employee: null, newEmployeeClicked: true }); }
+              }
+            >
+              New Employee
+            </button>
         }
       </div>
     );

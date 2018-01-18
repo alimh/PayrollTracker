@@ -1,20 +1,7 @@
 import express from 'express';
 import Employee from '../models/employees';
 
-
-// import jwt from 'jsonwebtoken';
-//import employees from '../data/employees';
-
 const router = new express.Router();
-
-// router.post('/rsvp', (req, res) => {
-//   const guests = req.body;
-//   req.db.collection('guests').insertOne(guests, (err, result) => {
-//     if (!err) {
-//       res.json(result);
-//     }
-//   });
-// });
 
 router.get('/list', (req, res) => {
   Employee.find({ inactivatedDate: null }, (err, employees) => {
@@ -25,7 +12,8 @@ router.get('/list', (req, res) => {
     const employeesWithSearch = employees.map((emp) => {
       const search = emp.jobs.length > 0 ?
         emp.jobs.reduce(
-          (acc, job) => acc.concat(job.category.concat(job.jobName.concat(job.per.concat(job.pc.toString())))),
+          (acc, job) =>
+            acc.concat(job.category.concat(job.jobName.concat(job.per.concat(job.pc.toString())))),
           emp.name,
         ) :
         emp.name;
@@ -48,7 +36,7 @@ router.get('/detail/:id', (req, res) => {
 router.post('/new', (req, res) => {
   const newEmployee = Employee({
     name: req.body.name,
-    hireDate: new Date(req.body.hireDate),
+    hireDate: req.body.hireDate ? new Date(req.body.hireDate) : null,
     created_at: new Date(),
   });
 
@@ -89,7 +77,6 @@ router.post('/job/new', (req, res) => {
 });
 
 router.post('/job/changerate', (req, res) => {
-  console.log(req.body);
   const id = req.body.id;
   const jobN = req.body.jobN;
   const rateChange = req.body.rateChange;

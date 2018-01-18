@@ -45,7 +45,6 @@ const EmployeeDetail = (props) => {
               <td>{x.maxHours ? x.maxHours : '-'}</td>
               <td>
                 <EmployeeDetailChangeRate
-                  rate={x.rate}
                   rateChangeHistory={x.rateChangeHistory}
                   onSave={rateChange => handleChangeRate(rateChange, n)}
                 />
