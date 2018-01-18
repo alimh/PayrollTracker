@@ -39,7 +39,8 @@ class EmployeeDetailNewJob extends React.Component {
   resetJobDetail() {
     this.setState({
       jobDetails: {
-        job: '',
+        category: '',
+        jobName: '',
         rate: '',
         per: '',
         pc: '',
@@ -47,7 +48,8 @@ class EmployeeDetailNewJob extends React.Component {
         maxHours: '',
       },
       errorChecks: {
-        job: t => checkNotBlankError(t),
+        category: t => checkNotBlankError(t),
+        jobName: () => false,
         rate: t => checkNotBlankError(t) || checkIfNumberError(t) || checkPositiveNumberError(t),
         per: t => checkNotBlankError(t),
         pc: t => checkNotBlankError(t),
@@ -92,7 +94,15 @@ class EmployeeDetailNewJob extends React.Component {
       return true;
     });
     if (error) this.setState({ errMsg: { ...this.state.errMsg, ...errors } });
-    else this.props.onSave(this.state.jobDetails);
+    else {
+      this.props.onSave({
+        ...this.state.jobDetails,
+        rate: parseFloat(this.state.jobDetails.rate),
+        jobName: this.state.jobDetails.jobName === '' ?
+          this.state.jobDetails.category :
+          this.state.jobDetails.jobName,
+      });
+    }
   }
 
   handleCancel(e) {
@@ -113,21 +123,28 @@ class EmployeeDetailNewJob extends React.Component {
     return (
       <form id="employee-detail-new-job-form">
         <SelectBox
-          title="Job"
-          onUpdate={text => this.handleUpdate('job', text)}
+          title="Category"
+          onUpdate={text => this.handleUpdate('category', text)}
           options={this.state.options.Jobs}
-          value={this.state.jobDetails.job}
-          errMsg={this.state.errMsg.job}
+          value={this.state.jobDetails.category}
+          errMsg={this.state.errMsg.category}
+        />
+        <InputBox
+          title="Job Name"
+          onUpdate={text => this.handleUpdate('jobName', text)}
+          placeholder={this.state.jobDetails.category}
+          value={this.state.jobDetails.jobName}
+          errMsg={this.state.errMsg.jobName}
         />
         <InputBox
           title="Rate"
-          onUpdate={text => this.handleUpdate('rate', parseFloat(text))}
+          onUpdate={text => this.handleUpdate('rate', text)}
           value={this.state.jobDetails.rate}
           errMsg={this.state.errMsg.rate}
         />
         <SelectBox
           title="Per"
-          onUpdate={text => this.handleUpdate('per', text, () => checkNotBlankError(text))}
+          onUpdate={text => this.handleUpdate('per', text)}
           options={this.state.options.Pers}
           value={this.state.jobDetails.per}
           errMsg={this.state.errMsg.per}

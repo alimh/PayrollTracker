@@ -1,0 +1,110 @@
+import React from 'react';
+import { InputBox } from './FormComponents';
+import { checkIfNumberError, checkPositiveNumberError, checkNotBlankError } from '../utils/FormValidation';
+
+class EmployeeDetailChangeRate extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      rate: '',
+      comment: '',
+      errMsg: { },
+      errorChecks: {
+        rate: t => checkNotBlankError(t) || checkIfNumberError(t) || checkPositiveNumberError(t),
+        comment: t => checkNotBlankError(t),
+      },
+    };
+  }
+
+  handleUpdate(field, text) {
+    const newErrMsg = {
+      ...this.state.errMsg,
+      [field]: this.state.errorChecks[field](text),
+    };
+
+    this.setState({ [field]: text, errMsg: newErrMsg });
+  }
+
+  handleSave(e) {
+    e.preventDefault();
+    const errors = this.state.errMsg;
+    let error = false;
+    Object.keys(this.state.errorChecks).forEach((field) => {
+      errors[field] = this.state.errorChecks[field](this.state[field]);
+      if (errors[field]) error = true;
+      return true;
+    });
+    if (error) this.setState({ errMsg: { ...this.state.errMsg, ...errors } });
+    else {
+      const rateChange = {
+        rate: parseFloat(this.state.rate),
+        comment: this.state.comment,
+        changeDate: new Date(),
+      };
+      this.props.onSave(rateChange);
+    }
+  }
+
+  handleClear(e) {
+    e.preventDefault();
+    this.resetForm();
+  }
+
+  render() {
+    return (
+      <div>
+        <div>
+          <h4>Rate History</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Rate</th>
+                <th>Comment</th>
+                <th />
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {
+                this.props.rateChangeHistory.map((x, n) => (
+                  <tr key={n.toString()}>
+                    <td>{x.changeDate}</td>
+                    <td>{x.rate}</td>
+                    <td>{x.comment}</td>
+                    <td />
+                    <td />
+                  </tr>
+                ))
+              }
+              <tr key="new">
+                <td />
+                <td>
+                  <InputBox
+                    title="New Rate"
+                    onUpdate={text => this.handleUpdate('rate', text)}
+                    value={this.state.rate}
+                    errMsg={this.state.errMsg.rate}
+                  />
+                </td>
+                <td>
+                  <InputBox
+                    title="Comments"
+                    onUpdate={text => this.handleUpdate('comment', text)}
+                    value={this.state.comment}
+                    errMsg={this.state.errMsg.comment}
+                  />
+                </td>
+                <td><button onClick={e => this.handleSave(e)}>Save</button></td>
+                <td><button onClick={e => this.handleClear(e)}>Clear</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
+}
+
+export default EmployeeDetailChangeRate;

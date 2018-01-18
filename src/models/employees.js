@@ -8,7 +8,8 @@ const employeesSchema = new Schema({
   inactivedDate: Date,
   created_at: Date,
   jobs: [{
-    job: String,
+    category: String,
+    jobName: String,
     rate: Number,
     per: String,
     otExempt: Boolean,
@@ -18,7 +19,7 @@ const employeesSchema = new Schema({
     removed_at: Date,
     rateChangeHistory: [{
       changeDate: Date,
-      prevRate: Number,
+      rate: Number,
       comment: String,
     }],
   }],

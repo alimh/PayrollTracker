@@ -25,7 +25,7 @@ router.get('/list', (req, res) => {
     const employeesWithSearch = employees.map((emp) => {
       const search = emp.jobs.length > 0 ?
         emp.jobs.reduce(
-          (acc, job) => acc.concat(job.job.concat(job.per.concat(job.pc.toString()))),
+          (acc, job) => acc.concat(job.category.concat(job.jobName.concat(job.per.concat(job.pc.toString())))),
           emp.name,
         ) :
         emp.name;
@@ -41,7 +41,6 @@ router.get('/detail/:id', (req, res) => {
     if (err) {
       return res.status(403).end();
     }
-    console.log(employee);
     return res.status(200).json(employee).end();
   });
 });
@@ -63,13 +62,19 @@ router.post('/new', (req, res) => {
 
 router.post('/job/new', (req, res) => {
   const newJob = {
-    job: req.body.job,
+    category: req.body.category,
+    jobName: req.body.jobName,
     rate: req.body.rate,
     per: req.body.per,
     pc: req.body.pc,
     maxHours: req.body.maxHours,
     otExempt: req.body.otExempt,
     created_at: new Date(),
+    rateChangeHistory: {
+      changeDate: new Date(),
+      rate: req.body.rate,
+      comment: 'Inital rate',
+    },
   };
 
   Employee.findByIdAndUpdate(
@@ -81,6 +86,21 @@ router.post('/job/new', (req, res) => {
       return res.status(200).end();
     },
   );
+});
+
+router.post('/job/changerate', (req, res) => {
+  console.log(req.body);
+  const id = req.body.id;
+  const jobN = req.body.jobN;
+  const rateChange = req.body.rateChange;
+  Employee.findById(id, (err, doc) => {
+    if (err) return res.status(403).json(err).end();
+    doc.jobs[jobN].rateChangeHistory.push(rateChange);
+    doc.jobs[jobN].set({ rate: rateChange.rate });
+
+    doc.save();
+    return res.status(200).json(doc).end();
+  });
 });
 
 router.post('/job/delete', (req, res) => {

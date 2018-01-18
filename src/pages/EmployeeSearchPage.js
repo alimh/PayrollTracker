@@ -27,7 +27,6 @@ export class EmployeeSearchPage extends React.Component {
     Axios.get('/api/employees/list', { headers: { Authorization: authorizationHeader } })
       .then((response) => {
         const data = response.data;
-        console.log(data);
         this.setState({ employeeList: data, employeeListFiltered: data });
       });
   }
@@ -75,6 +74,20 @@ export class EmployeeSearchPage extends React.Component {
       });
   }
 
+  handleChangeRate(id, jobN, rateChange) {
+    const payload = { id, jobN, rateChange };
+    const authorizationHeader = 'bearer '.concat(Auth.getToken());
+    Axios.post('/api/employees/job/changerate', payload, { headers: { Authorization: authorizationHeader } })
+    .then(() => {
+      console.log('success');
+//      this.setState({ jobDetails: null });
+  //    this.handleSelect(this.state.employee._id);
+    })
+    .catch((res) => {
+      this.setState({ errMsg: 'Server error: '.concat(res) });
+    });
+  }
+
   handleDeleteJob(n) {
     // 1. POST delete request to API
     // 2. Update state by calling componentDidMOunt() ?
@@ -105,11 +118,9 @@ export class EmployeeSearchPage extends React.Component {
         });
       },
       (err) => {
-        console.log(err);
         this.setState({ errMsg: 'Could not create new employee: '.concat(err.response) });
       })
       .catch((error) => {
-        console.log(error);
         this.setState({ errMsg: 'Could not create new employee: '.concat(error) });
       });
   }
@@ -119,7 +130,6 @@ export class EmployeeSearchPage extends React.Component {
   }
 
   render() {
-    console.log(this.state);
     return (
       <div className="page-content">
         <div className="error-message">{this.state.errMsg}</div>
@@ -135,6 +145,7 @@ export class EmployeeSearchPage extends React.Component {
             jobDetails={this.state.jobDetails}
             onDelete={n => this.handleDeleteJob(n)}
             onNew={newJob => this.handleNewJob(newJob)}
+            onChangeRate={(id, n, rateChange) => this.handleChangeRate(id, n, rateChange)}
           /> :
           <p>Select an employee</p>
         }

@@ -2,12 +2,6 @@ import React from 'react';
 import { InputBox } from './FormComponents';
 import { checkNotBlankError, checkValidDateError } from '../utils/FormValidation';
 
-const noErrors = (obj) => {
-  // check to make sure name and hireDate have been entered and there are no errors
-  const r = obj.name !== false || (obj.hireDate !== false && obj.hireDate !== undefined);
-  return !r;
-};
-
 class EmployeeNew extends React.Component {
   constructor() {
     super();
@@ -21,7 +15,7 @@ class EmployeeNew extends React.Component {
         name: t => checkNotBlankError(t),
         hireDate: t => t !== '' && checkValidDateError(t),
       },
-      errMsg: { initial: true },  //errors
+      errMsg: { },  //errors
     };
   }
 
