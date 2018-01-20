@@ -6,6 +6,7 @@ class EmployeeDetailChangeRate extends React.Component {
   constructor() {
     super();
     this.state = {
+      showHistory: false,
       rate: '',
       comment: '',
       errMsg: { },
@@ -26,6 +27,11 @@ class EmployeeDetailChangeRate extends React.Component {
       comment: '',
       errMsg: { },
     });
+  }
+
+  handleShowHistory(e) {
+    e.preventDefault();
+    this.setState({ showHistory: true });
   }
 
   handleUpdate(field, text) {
@@ -60,10 +66,10 @@ class EmployeeDetailChangeRate extends React.Component {
   handleClear(e) {
     e.preventDefault();
     this.resetForm();
+    this.setState({ showHistory: false });
   }
 
-  render() {
-    console.log(this.props);
+  renderHistory() {
     return (
       <div>
         <div>
@@ -116,6 +122,18 @@ class EmployeeDetailChangeRate extends React.Component {
         </div>
       </div>
     );
+  }
+  
+  renderButton() {
+    return (
+      <div>
+        <button onClick={e => this.handleShowHistory(e)}>Show History</button>
+      </div>
+    );
+  }
+
+  render() {
+    return this.state.showHistory ? this.renderHistory() : this.renderButton();
   }
 }
 
