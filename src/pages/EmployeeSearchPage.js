@@ -50,10 +50,17 @@ export class EmployeeSearchPage extends React.Component {
     const api = '/api/employees/detail/'.concat(id);
     Axios.get(api, { headers: { Authorization: authorizationHeader } })
     .then((response) => {
-      const data = response.data;
+      const name = this.state.employeeList.find(emp => emp.id === id).name;
+
+      const employee = {
+        id,
+        name,
+        jobs: response.data,
+      };
+
       this.setState({
         employeeDetailStatus: 'loaded',
-        employee: data,
+        employee,
         errMsg: null,
       });
     });
@@ -62,37 +69,43 @@ export class EmployeeSearchPage extends React.Component {
   handleNewJob(newJob) {
     // 1. POST info to API
     // 2. Call handleSelect() to update state?
-    const payload = { ...newJob, id: this.state.employee._id };
+    const payload = { ...newJob, id: this.state.employee.id };
     const authorizationHeader = 'bearer '.concat(Auth.getToken());
     Axios.post('/api/employees/job/new', payload, { headers: { Authorization: authorizationHeader } })
-      .then(() => {
-        // this.setState({ this.set.toUpperCasejobDetails: null });
-        // this.handleSelect(this.state.employee._id);
+      .then((res) => {
+        // add search term
+        const search = res.data;
+        const newEmployeeSearch = this.state.employeeList.find(emp =>
+          emp.id === this.state.employee.id,
+        );
+        newEmployeeSearch.search = newEmployeeSearch.search.concat(search);
+
+        this.handleSelect(this.state.employee.id);
       })
       .catch((res) => {
         this.setState({ errMsg: 'Server error: '.concat(res), jobDetails: newJob });
       });
   }
 
-  handleChangeRate(id, jobN, rateChange) {
-    const payload = { id, jobN, rateChange };
+  handleChangeRate(jobId, rateChange) {
+    const payload = { jobId, rateChange };
     const authorizationHeader = 'bearer '.concat(Auth.getToken());
     Axios.post('/api/employees/job/changerate', payload, { headers: { Authorization: authorizationHeader } })
     .then(() => {
       // this.setState({ employee: updateEmployee });
-      this.handleSelect(this.state.employee._id);
+      this.handleSelect(this.state.employee.id);
     })
     .catch((res) => {
       this.setState({ errMsg: 'Server error: '.concat(res) });
     });
   }
 
-  handleDeleteJob(n) {
+  handleRemoveJob(jobId, comment) {
     // 1. POST delete request to API
     // 2. Update state by calling componentDidMOunt() ?
-    const payload = { id: this.state.employee.id, job: n };
+    const payload = { jobId, comment };
     const authorizationHeader = 'bearer '.concat(Auth.getToken());
-    Axios.post('/api/employees/job/delete', payload, { headers: { Authorization: authorizationHeader } })
+    Axios.post('/api/employees/job/deactivate', payload, { headers: { Authorization: authorizationHeader } })
       .then(() => {
         this.handleSelect(this.state.employee.id);
       })
@@ -107,7 +120,8 @@ export class EmployeeSearchPage extends React.Component {
     Axios.post('/api/employees/new', payload, { headers: { Authorization: authorizationHeader } })
       .then((res) => {
         const newEmployeeList = this.state.employeeList;
-        const newEmployee = { ...res.data, search: res.data.name };
+        const newEmployee = res.data;
+
         newEmployeeList.push(newEmployee);
 
         this.setState({
@@ -117,7 +131,7 @@ export class EmployeeSearchPage extends React.Component {
           errMsg: null,
         });
 
-        this.handleSelect(newEmployee._id);
+        this.handleSelect(newEmployee.id);
       })
       .catch((error) => {
         this.setState({ errMsg: 'Could not create new employee: '.concat(error) });
@@ -148,7 +162,8 @@ export class EmployeeSearchPage extends React.Component {
               jobDetails={this.state.jobDetails}
               onDelete={n => this.handleDeleteJob(n)}
               onNew={newJob => this.handleNewJob(newJob)}
-              onChangeRate={(id, n, rateChange) => this.handleChangeRate(id, n, rateChange)}
+              onChangeRate={(jobN, rateChange) => this.handleChangeRate(jobN, rateChange)}
+              onRemove={(jobN, comment) => this.handleRemoveJob(jobN, comment)}
             /> :
             <p>Select an employee</p>
         }

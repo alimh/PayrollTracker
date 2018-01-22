@@ -3,18 +3,24 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const jobsSchema = new Schema({
-  employee: String,
+  employeeId: String,
+  category: String,
   jobName: String,
   rate: Number,
   per: String,
   otExempt: Boolean,
   maxHours: Number,
   pc: Number,
-  category: String,
   created_at: Date,
-  removed_at: Date,
+  deactivateDate: Date,
+  deactivateComment: String,
+  rateChangeHistory: [{
+    changeDate: Date,
+    rate: Number,
+    comment: String,
+  }],
 });
 
-const Settings = mongoose.model('Job', jobsSchema);
+const Jobs = mongoose.model('Job', jobsSchema);
 
-export default Settings;
+export default Jobs;

@@ -1,20 +1,19 @@
 import React from 'react';
 import EmployeeDetailNewJob from './EmployeeDetailNewJob';
 import EmployeeDetailChangeRate from './EmployeeDetailChangeRate';
+import EmployeeDetailRemoveJob from './EmployeeDetailRemoveJob';
 
 const EmployeeDetail = (props) => {
-  const handleDelete = (e, n) => {
-    e.preventDefault();
-    props.onDelete(n);
+  const handleRemove = (comment, id) => {
+    props.onRemove(id, comment);
   };
 
   const handleSave = (newJob) => {
-    console.log(newJob);
     props.onNew(newJob);
   };
 
-  const handleChangeRate = (rateChange, n) => {
-    props.onChangeRate(props.employee._id, n, rateChange);
+  const handleChangeRate = (rateChange, id) => {
+    props.onChangeRate(id, rateChange);
   };
 
   return (
@@ -30,12 +29,13 @@ const EmployeeDetail = (props) => {
             <th>Per</th>
             <th>Overtime Exempt</th>
             <th>Maximum Hours Before OT</th>
-            <th />
+            <th>Rate History</th>
+            <th>Remove</th>
           </tr>
         </thead>
         <tbody>
-          {props.employee.jobs.map((x, n) => (
-            <tr key={n.toString()}>
+          {props.employee.jobs.map(x => (
+            <tr key={x.id}>
               <td>{x.category}</td>
               <td>{x.jobName}</td>
               <td>{x.pc}</td>
@@ -46,7 +46,12 @@ const EmployeeDetail = (props) => {
               <td>
                 <EmployeeDetailChangeRate
                   rateChangeHistory={x.rateChangeHistory}
-                  onSave={rateChange => handleChangeRate(rateChange, n)}
+                  onSave={rateChange => handleChangeRate(rateChange, x.id)}
+                />
+              </td>
+              <td>
+                <EmployeeDetailRemoveJob
+                  onRemove={comment => handleRemove(comment, x.id)}
                 />
               </td>
             </tr>

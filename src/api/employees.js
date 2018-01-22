@@ -1,35 +1,45 @@
 import express from 'express';
 import Employee from '../models/employees';
+import Job from '../models/jobs';
 
 const router = new express.Router();
 
 router.get('/list', (req, res) => {
   Employee.find({ inactivatedDate: null }, (err, employees) => {
-    if (err) {
-      return res.status(403).end();
-    }
+    if (err) return res.status(403).json(err).end();
 
-    const employeesWithSearch = employees.map((emp) => {
-      const search = emp.jobs.length > 0 ?
-        emp.jobs.reduce(
-          (acc, job) =>
-            acc.concat(job.category.concat(job.jobName.concat(job.per.concat(job.pc.toString())))),
-          emp.name,
-        ) :
-        emp.name;
-      return { ...emp._doc, search };
+    Job.find({ deactivateDate: null }, (errJobs, jobs) => {
+      if (errJobs) return res.status(403).json(errJobs).end();
+
+      const search = jobs.reduce((acc, job) => {
+        acc[job.employeeId] = acc[job.employeeId] ?
+          acc[job.employeeId].concat(
+            job.category.concat(job.jobName.concat(job.per.concat(job.pc.toString()))),
+          ) :
+          job.category.concat(job.jobName.concat(job.per.concat(job.pc.toString())));
+        return acc;
+      }, { });
+
+      const activeEmployeesWithSearch = employees.map((emp) => {
+        const id = emp._id;
+        const name = emp.name;
+        return { ...emp._doc, id, search: name.concat(search[id] ? search[id] : '') };
+      });
+
+      return res.status(200).json(activeEmployeesWithSearch).end();
     });
-
-    return res.status(200).json(employeesWithSearch).end();
   });
 });
 
 router.get('/detail/:id', (req, res) => {
-  Employee.findById(req.params.id, (err, employee) => {
-    if (err) {
-      return res.status(403).end();
-    }
-    return res.status(200).json(employee).end();
+  Job.find({ employeeId: req.params.id, deactivateDate: null }, (err, jobs) => {
+    if (err) return res.status(403).end();
+
+    const jobsWithId = jobs.map((job) => {
+      const jobWithId = { ...job._doc, id: job.id };
+      return jobWithId;
+    });
+    return res.status(200).json(jobsWithId).end();
   });
 });
 
@@ -42,7 +52,9 @@ router.post('/new', (req, res) => {
 
   Employee.create(newEmployee, (err, emp) => {
     if (err) return res.status(403).send('Error test message');
-    return res.status(200).json(emp).end();
+    const id = emp._id;
+    const search = emp.name;
+    return res.status(200).json({ ...emp._doc, id, search }).end();
   });
 
   // return res.status(200).end();
@@ -50,6 +62,7 @@ router.post('/new', (req, res) => {
 
 router.post('/job/new', (req, res) => {
   const newJob = {
+    employeeId: req.body.id,
     category: req.body.category,
     jobName: req.body.jobName,
     rate: req.body.rate,
@@ -65,36 +78,40 @@ router.post('/job/new', (req, res) => {
     },
   };
 
-  Employee.findByIdAndUpdate(
-    req.body.id,
-    { $push: { jobs: newJob } },
-    { new: true },
-    (err) => {
-      if (err) return res.status(403).json(err).end();
-      return res.status(200).end();
-    },
-  );
-});
-
-router.post('/job/changerate', (req, res) => {
-  const id = req.body.id;
-  const jobN = req.body.jobN;
-  const rateChange = req.body.rateChange;
-  Employee.findById(id, (err, doc) => {
+  Job.create(newJob, (err) => {
     if (err) return res.status(403).json(err).end();
-    doc.jobs[jobN].rateChangeHistory.push(rateChange);
-    doc.jobs[jobN].set({ rate: rateChange.rate });
 
-    doc.save();
-    return res.status(200).json(doc).end();
+    const search = newJob.category.concat(newJob.jobName.concat(newJob.per.concat(newJob.pc.toString())));
+    return res.status(200).json(search).end();
   });
 });
 
-router.post('/job/delete', (req, res) => {
-  console.log('got post request to delete');
-  console.log(req.body);
+router.post('/job/changerate', (req, res) => {
+  const jobId = req.body.jobId;
+  const rateChange = req.body.rateChange;
 
-  return res.status(200).end();
+  Job.findById(jobId, (err, doc) => {
+    if (err) return res.status(403).json(err).end();
+    doc.rateChangeHistory.push(rateChange);
+    doc.set({ rate: rateChange.rate });
+
+    doc.save();
+    return res.status(200).end();
+  });
+});
+
+router.post('/job/deactivate', (req, res) => {
+  const jobId = req.body.jobId;
+  const comment = req.body.comment;
+  Job.findById(jobId, (err, doc) => {
+    if (err) return res.status(403).json(err).end();
+    doc.set({
+      deactivateDate: new Date(),
+      deactivateComment: comment,
+    });
+    doc.save();
+    return res.status(200).end();
+  });
 });
 
 router.get('/jobs', (req, res) => {

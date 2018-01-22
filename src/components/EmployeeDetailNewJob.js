@@ -87,12 +87,13 @@ class EmployeeDetailNewJob extends React.Component {
   handleSave(e) {
     e.preventDefault();
     const errors = this.state.errMsg;
-    let error = false;
-    Object.keys(this.state.jobDetails).forEach((field) => {
+
+    // loop through error checks and make sure they are all false
+    const error = Object.keys(this.state.errorChecks).reduce((acc, field) => {
       errors[field] = this.state.errorChecks[field](this.state.jobDetails[field]);
-      if (errors[field]) error = true;
-      return true;
-    });
+      return acc || errors[field] !== false;
+    }, false);
+
     if (error) this.setState({ errMsg: { ...this.state.errMsg, ...errors } });
     else {
       this.props.onSave({

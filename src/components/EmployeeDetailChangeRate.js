@@ -46,12 +46,13 @@ class EmployeeDetailChangeRate extends React.Component {
   handleSave(e) {
     e.preventDefault();
     const errors = this.state.errMsg;
-    let error = false;
-    Object.keys(this.state.errorChecks).forEach((field) => {
+
+    // loop through error checks and make sure they are all false
+    const error = Object.keys(this.state.errorChecks).reduce((acc, field) => {
       errors[field] = this.state.errorChecks[field](this.state[field]);
-      if (errors[field]) error = true;
-      return true;
-    });
+      return acc || errors[field] !== false;
+    }, false);
+
     if (error) this.setState({ errMsg: { ...this.state.errMsg, ...errors } });
     else {
       const rateChange = {
@@ -115,7 +116,7 @@ class EmployeeDetailChangeRate extends React.Component {
                   />
                 </td>
                 <td><button onClick={e => this.handleSave(e)}>Save</button></td>
-                <td><button onClick={e => this.handleClear(e)}>Clear</button></td>
+                <td><button onClick={e => this.handleClear(e)}>Close</button></td>
               </tr>
             </tbody>
           </table>
@@ -123,7 +124,7 @@ class EmployeeDetailChangeRate extends React.Component {
       </div>
     );
   }
-  
+
   renderButton() {
     return (
       <div>
