@@ -39,3 +39,4 @@ jspm_packages
 
 src/server-es5.js
 src/static/bundle.js
+src/static/js/bundle.js

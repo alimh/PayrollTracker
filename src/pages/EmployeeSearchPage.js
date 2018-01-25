@@ -27,6 +27,7 @@ export class EmployeeSearchPage extends React.Component {
     Axios.get('/api/employees/list', { headers: { Authorization: authorizationHeader } })
       .then((response) => {
         const data = response.data;
+        console.log(data);
         this.setState({ employeeList: data, employeeListFiltered: data });
       });
   }
@@ -69,7 +70,7 @@ export class EmployeeSearchPage extends React.Component {
   handleNewJob(newJob) {
     // 1. POST info to API
     // 2. Call handleSelect() to update state?
-    const payload = { ...newJob, id: this.state.employee.id };
+    const payload = { ...newJob, id: this.state.employee.id, name: this.state.employee.name };
     const authorizationHeader = 'bearer '.concat(Auth.getToken());
     Axios.post('/api/employees/job/new', payload, { headers: { Authorization: authorizationHeader } })
       .then((res) => {

@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 
 const jobsSchema = new Schema({
   employeeId: String,
+  employeeName: String,
   category: String,
   jobName: String,
   rate: Number,

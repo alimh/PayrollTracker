@@ -47,7 +47,7 @@ export const NewPayrollToFillEmployee = (props) => {
   const jobDetail = index => (
     <tr>
       <td key="name" style={style}>{index === 0 ? props.employee.name : ''}</td>
-      <td key="store" style={style}>{props.employee.jobs[index].store}</td>
+      <td key="store" style={style}>{props.employee.jobs[index].pc}</td>
       <td key="role" style={style}>{props.employee.jobs[index].jobName}</td>
       <td key="rate" style={style}>
         {props.employee.jobs[index].rate} / {props.employee.jobs[index].per}

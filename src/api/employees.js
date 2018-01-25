@@ -1,6 +1,7 @@
 import express from 'express';
 import Employee from '../models/employees';
 import Job from '../models/jobs';
+import employees from '../data/employees';
 
 const router = new express.Router();
 
@@ -56,13 +57,12 @@ router.post('/new', (req, res) => {
     const search = emp.name;
     return res.status(200).json({ ...emp._doc, id, search }).end();
   });
-
-  // return res.status(200).end();
 });
 
 router.post('/job/new', (req, res) => {
   const newJob = {
     employeeId: req.body.id,
+    employeeName: req.body.name,
     category: req.body.category,
     jobName: req.body.jobName,
     rate: req.body.rate,
@@ -117,12 +117,23 @@ router.post('/job/deactivate', (req, res) => {
 router.get('/jobs', (req, res) => {
   // Filters employees for those who have active jobs.
   // Returns list
-  const activeJobs = employees.reduce((accumulator, employee) => {
-    const active = employee.jobs.filter(job => job.active); // return job if job.active == true
-    if (active.length > 0) accumulator.push({ ...employee, jobs: active });
-    return accumulator;
-  }, []);
 
-  return res.status(200).json(activeJobs).end();
+  Job.find({ deactivateDate: null }, (errJobs, jobs) => {
+    if (errJobs) return res.status(403).json(errJobs).end();
+
+    const activeJobs = jobs.reduce((acc, j) => {
+      if (acc[j.employeeId]) acc[j.employeeId].jobs.push(j);
+      else acc[j.employeeId] = { name: j.employeeName, jobs: [j] };
+
+      return acc;
+    }, {});
+    const activeJobsByEmployee = [];
+    Object.keys(activeJobs).forEach((id) => {
+      activeJobsByEmployee.push({ ...activeJobs[id], id });
+    });
+
+    return res.status(200).json(activeJobsByEmployee).end();
+  });
 });
+
 export default router;
