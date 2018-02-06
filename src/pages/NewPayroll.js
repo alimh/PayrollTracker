@@ -28,11 +28,11 @@ const computePay = (employee) => {
   // calculate pay for each job and each week
   employee.jobs.forEach((job, indexJob) => {
     job.weekData.forEach((week, indexWeek) => {
-      const q = parseFloat(week.quantity.value);
+      const q = parseFloat(week.quantity);
       const r = parseFloat(job.rate);
       const m = parseFloat(job.maxHours);
-      const t = parseFloat(week.totalHours.value);
-      const e = parseFloat(week.excessHours.value);
+      const t = parseFloat(week.totalHours);
+      const e = parseFloat(week.excessHours);
 
       const regularPay = q * r;
       const effectiveRate = m ? r / m : r;
@@ -40,6 +40,10 @@ const computePay = (employee) => {
 
       newEmployee.jobs[indexJob].weekData[indexWeek].regularPay = regularPay;
       newEmployee.jobs[indexJob].weekData[indexWeek].otPay = otPay;
+
+      newEmployee.jobs[indexJob].weekData[indexWeek].totalHours = t;
+      newEmployee.jobs[indexJob].weekData[indexWeek].excessHours = e;
+      newEmployee.jobs[indexJob].weekData[indexWeek].quantity = q;
 
       pays.push({ week: indexWeek, regular: regularPay, ot: otPay, totalHours: t });
     });
@@ -86,49 +90,64 @@ export class NewPayroll extends React.Component {
     Axios.get('/api/employees/jobs', { headers: { Authorization: authorizationHeader } })
       .then((res) => {
         const data = res.data;
-        console.log(data);
-        const blankPayroll = data.reduce((accumulator, employee) => {
-          const blankJobs = employee.jobs.reduce((acc, job) => {
-            const blankWeekData = new Array(this.state.numWeeks);
-            for (let i = 0; i < this.state.numWeeks; i += 1) {
-              blankWeekData[i] = {
-                quantity: {
-                  value: [''],
-                  errMsg: [''],
-                },
-                totalHours: {
-                  value: [''],
-                  errMsg: [''],
-                },
-                excessHours: {
-                  value: [''],
-                  errMsg: [''],
-                },
-                regularPay: [0],
-                otPay: [0],
-              };
-            }
-            acc.push({
-              ...job,
-              weekData: blankWeekData,
-            });
-            return acc;
-          }, []);
-          const pp = new Array(this.state.numWeeks).fill(0);
-          accumulator.push({ ...employee, jobs: blankJobs, premiumPay: pp });
-          return accumulator;
-        }, []);
-        console.log(blankPayroll);
-        this.setState({ activeJobs: blankPayroll });
+
+        this.createBlankPayroll(data);
       }).catch((reason) => {
-        console.log('error');
         this.setState({ errMsg: reason.toString() });
       });
   }
 
+  createBlankPayroll(data) {
+    const blankPayroll = data.reduce((accumulator, employee) => {
+      const blankJobs = employee.jobs.reduce((acc, job) => {
+        const blankWeekData = new Array(this.state.numWeeks);
+        const blankWeekDataErr = new Array(this.state.numWeeks);
+        for (let i = 0; i < this.state.numWeeks; i += 1) {
+          blankWeekData[i] = {
+            quantity: '',
+            totalHours: '',
+            excessHours: '',
+            regularPay: 0,
+            otPay: 0,
+          };
+          blankWeekDataErr[i] = {
+            quantity: '',
+            totalHours: '',
+            excessHours: '',
+          };
+        }
+        acc.push({
+          ...job,
+          weekData: blankWeekData,
+          weekDataErr: blankWeekDataErr,
+        });
+        return acc;
+      }, []);
+      const pp = new Array(this.state.numWeeks).fill(0);
+      accumulator.push({ ...employee, jobs: blankJobs, premiumPay: pp });
+      return accumulator;
+    }, []);
+    this.setState({ activeJobs: blankPayroll });
+  }
+
+  saveTempPayroll(completedJobs, activeJobs) {
+    console.log('here');
+    const payload = { completedJobs, activeJobs };
+    console.log(payload);
+    const authorizationHeader = 'bearer '.concat(Auth.getToken());
+    Axios.post('/api/employees/payroll/temp', payload, { headers: { Authorization: authorizationHeader } })
+      .then(() => {
+        this.setState({
+          completedJobs,
+          activeJobs,
+        });
+      })
+      .catch(err => this.setState({ errMsg: err }));
+  }
+
   handleUpdate(val, nameField, indexWeek, indexJob, indexEmployee) {
     const newActiveJobs = this.state.activeJobs;
-    newActiveJobs[indexEmployee].jobs[indexJob].weekData[indexWeek][nameField].value = val;
+    newActiveJobs[indexEmployee].jobs[indexJob].weekData[indexWeek][nameField] = val;
     this.setState({ activeJobs: newActiveJobs });
   }
 
@@ -140,25 +159,20 @@ export class NewPayroll extends React.Component {
 
     newActiveJobs[indexEmployee].jobs.forEach((job, indexJob) => {
       job.weekData.forEach((data, indexWeek) => {
-        const errMsgQ = checkError(data.quantity.value);
-        const errMsgT =
-          job.per === 'Hour' && data.totalHours.value !== data.quantity.value ?
-            'must equal quantity' :
-            false
-          ||
-          checkError(data.totalHours.value);
-        const errMsgE =
-          data.excessHours.value > data.totalHours.value ?
-            'cannot be greater than total hours' :
-            false
-          ||
-          checkError(data.excessHours.value);
+        const errMsgQ = checkError(data.quantity);
+        const errMsgT = job.otExempt ? false : checkError(data.totalHours);
+        const errMsgE = job.otExempt ? false :
+          (
+            data.excessHours > data.totalHours ?
+              'cannot be greater than total hours' :
+              false
+          ) || checkError(data.excessHours);
 
-        newActiveJobs[indexEmployee].jobs[indexJob].weekData[indexWeek].quantity.errMsg =
+        newActiveJobs[indexEmployee].jobs[indexJob].weekDataErr[indexWeek].quantity =
           !(errMsgQ !== false);
-        newActiveJobs[indexEmployee].jobs[indexJob].weekData[indexWeek].totalHours.errMsg =
+        newActiveJobs[indexEmployee].jobs[indexJob].weekDataErr[indexWeek].totalHours =
           !(errMsgT !== false);
-        newActiveJobs[indexEmployee].jobs[indexJob].weekData[indexWeek].excessHours.errMsg =
+        newActiveJobs[indexEmployee].jobs[indexJob].weekDataErr[indexWeek].excessHours =
           !(errMsgE !== false);
 
         if (errMsgQ) errors.push('Quantity for '.concat(job.jobName).concat(' Week ').concat(indexWeek + 1).concat(' ').concat(errMsgQ));
@@ -175,11 +189,7 @@ export class NewPayroll extends React.Component {
       newCompletedJobs.push(newEmployee);
       newActiveJobs.splice(indexEmployee, 1);
 
-      this.setState({
-        completedJobs: newCompletedJobs,
-        activeJobs: newActiveJobs,
-        errMsg: errors,
-      });
+      this.saveTempPayroll(newCompletedJobs, newActiveJobs);
     } else {
       this.setState({
         errMsg: errors,
@@ -206,7 +216,6 @@ export class NewPayroll extends React.Component {
   }
 
   render() {
-    console.log(this.state);
     return (
       <div className="page-content">
         <div className="error">
@@ -237,12 +246,12 @@ export class NewPayroll extends React.Component {
             /> :
             <div>---</div>
         }
+        <PayrollCategorySummary jobs={this.state.completedJobs} />
         {
           this.state.completedJobs.length && !this.state.activeJobs.length ?
             <button onClick={() => this.handleSubmit()}>Submit</button> :
             <div />
         }
-        <PayrollCategorySummary jobs={this.state.completedJobs} />
       </div>
     );
   }

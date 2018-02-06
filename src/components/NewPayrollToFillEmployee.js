@@ -12,9 +12,16 @@ export const NewPayrollToFillEmployee = (props) => {
         <td style={style} key={i.toString().concat('-quanitity')}>
           <InputBox
             name={index.toString().concat('-quantity')}
-            value={props.employee.jobs[index].weekData[i].quantity.value}
-            onUpdate={val => props.onUpdate(val, 'quantity', i, index)}
-            errMsg={props.employee.jobs[index].weekData[i].quantity.errMsg === false}
+            value={props.employee.jobs[index].weekData[i].quantity}
+            onUpdate={(val) => {
+              props.onUpdate(val, 'quantity', i, index);
+              if (per === 'Hour') {
+                props.onUpdate(val, 'totalHours', i, index);
+                if (val > 40) props.onUpdate(val - 40, 'excessHours', i, index);
+                else props.onUpdate(0, 'excessHours', i, index);
+              }
+            }}
+            errMsg={props.employee.jobs[index].weekDataErr[i].quantity === false}
             placeholder={per}
           />
         </td>
@@ -23,10 +30,11 @@ export const NewPayrollToFillEmployee = (props) => {
         <td style={style} key={i.toString().concat('-totalHours')}>
           <InputBox
             name={index.toString().concat('-totalHours')}
-            value={props.employee.jobs[index].weekData[i].totalHours.value}
+            value={props.employee.jobs[index].weekData[i].totalHours}
             onUpdate={val => props.onUpdate(val, 'totalHours', i, index)}
-            errMsg={props.employee.jobs[index].weekData[i].totalHours.errMsg === false}
+            errMsg={props.employee.jobs[index].weekDataErr[i].totalHours === false}
             placeholder="Hours"
+            disabled={props.employee.jobs[index].otExempt || per === 'Hour'}
           />
         </td>
       ));
@@ -34,10 +42,11 @@ export const NewPayrollToFillEmployee = (props) => {
         <td style={style} key={i.toString().concat('-excessHours')}>
           <InputBox
             name={index.toString().concat('-excessHours')}
-            value={props.employee.jobs[index].weekData[i].excessHours.value}
+            value={props.employee.jobs[index].weekData[i].excessHours}
             onUpdate={val => props.onUpdate(val, 'excessHours', i, index)}
-            errMsg={props.employee.jobs[index].weekData[i].excessHours.errMsg === false}
+            errMsg={props.employee.jobs[index].weekDataErr[i].excessHours === false}
             placeholder="Hours"
+            disabled={props.employee.jobs[index].otExempt || per === 'Hour'}
           />
         </td>
       ));

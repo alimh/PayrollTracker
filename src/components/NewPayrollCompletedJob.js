@@ -13,12 +13,12 @@ export const NewPayrollCompletedJob = (props) => {
       ));
       detail.push((
         <td style={style} key={i.toString().concat('-totalHours')}>
-          {props.employee.jobs[index].weekData[i].totalHours.value}
+          {props.employee.jobs[index].weekData[i].totalHours.value || '---'}
         </td>
       ));
       detail.push((
         <td style={style} key={i.toString().concat('-excessHours')}>
-          {props.employee.jobs[index].weekData[i].excessHours.value}
+          {props.employee.jobs[index].weekData[i].excessHours.value || '---'}
         </td>
       ));
       detail.push((
@@ -28,7 +28,7 @@ export const NewPayrollCompletedJob = (props) => {
       ));
       detail.push((
         <td style={style} key={i.toString().concat('-otPay')}>
-          {props.employee.jobs[index].weekData[i].otPay}
+          {props.employee.jobs[index].weekData[i].otPay || '---'}
         </td>
       ));
     }

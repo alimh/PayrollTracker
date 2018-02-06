@@ -1,7 +1,7 @@
 import express from 'express';
 import Employee from '../models/employees';
 import Job from '../models/jobs';
-import employees from '../data/employees';
+import Payroll from '../models/payroll';
 
 const router = new express.Router();
 
@@ -115,25 +115,46 @@ router.post('/job/deactivate', (req, res) => {
 });
 
 router.get('/jobs', (req, res) => {
+  // Checks to see if there is a temporary payroll saved.
+  // If yes, sends active and completed jobs
+  // Else,
   // Filters employees for those who have active jobs.
   // Returns list
-
   Job.find({ deactivateDate: null }, (errJobs, jobs) => {
     if (errJobs) return res.status(403).json(errJobs).end();
 
     const activeJobs = jobs.reduce((acc, j) => {
-      if (acc[j.employeeId]) acc[j.employeeId].jobs.push(j);
-      else acc[j.employeeId] = { name: j.employeeName, jobs: [j] };
+      const { created_at, deactivateComment, deactivateDate, rateChangeHistory, ...trimmedJ } = j._doc;
+
+      if (acc[j.employeeId]) acc[j.employeeId].jobs.push(trimmedJ);
+      else acc[j.employeeId] = { employeeName: j.employeeName, jobs: [trimmedJ] };
 
       return acc;
     }, {});
     const activeJobsByEmployee = [];
     Object.keys(activeJobs).forEach((id) => {
-      activeJobsByEmployee.push({ ...activeJobs[id], id });
+      activeJobsByEmployee.push({ ...activeJobs[id], employeeId: id });
     });
-
     return res.status(200).json(activeJobsByEmployee).end();
   });
+});
+
+router.post('/payroll/temp', (req, res) => {
+  const completedJobs = req.body.completedJobs;
+  completedJobs.forEach((emp) => {
+    console.log(emp.name);
+
+    const payroll = {
+      employeeId: emp.id,
+      employeeName: emp.name,
+      jobs: emp.jobs,
+      premiumPay: emp.premiumPay,
+      payrollId: req.body.payrollId || 0,
+      status: 'completed',
+    };
+    console.log(payroll);
+  });
+  return res.status(200).end();
 });
 
 export default router;

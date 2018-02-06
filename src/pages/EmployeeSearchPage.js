@@ -108,6 +108,7 @@ export class EmployeeSearchPage extends React.Component {
     const authorizationHeader = 'bearer '.concat(Auth.getToken());
     Axios.post('/api/employees/job/deactivate', payload, { headers: { Authorization: authorizationHeader } })
       .then(() => {
+        console.log('removed successful');
         this.handleSelect(this.state.employee.id);
       })
       .catch((res) => {
